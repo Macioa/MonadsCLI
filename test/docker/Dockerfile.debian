@@ -1,0 +1,25 @@
+FROM debian:bookworm-slim
+
+ARG GO_VERSION=1.20.13
+
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends ca-certificates curl tar gzip \
+  && rm -rf /var/lib/apt/lists/*
+
+RUN arch="$(uname -m)" \
+  && case "$arch" in \
+    x86_64) go_arch="amd64" ;; \
+    aarch64|arm64) go_arch="arm64" ;; \
+    *) echo "unsupported arch: $arch" && exit 1 ;; \
+  esac \
+  && curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-${go_arch}.tar.gz" \
+  | tar -C /usr/local -xz
+
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+WORKDIR /app
+COPY . /app
+
+RUN go build -o /usr/local/bin/monadscli ./cmd/monadscli
+
+CMD ["monadscli", "run", "--command", "echo hello from debian"]
