@@ -19,3 +19,8 @@ jobs:
         run: |
           chmod +x test/docker/run-all.sh
           ./test/docker/run-all.sh
+
+      - name: Run Go tests in installed images
+        run: |
+          chmod +x test/docker/run-tests.sh
+          ./test/docker/run-tests.sh

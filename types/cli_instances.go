@@ -42,7 +42,7 @@ var AiderCLI = CLI{
 	KeyENV:  "OPENAI_API_KEY, ANTHROPIC_API_KEY",
 	Command: "aider",
 	Prompt:  "aider <file1> <file2>",
-	Install: "python -m pip install -U aider-chat",
+	Install: "python -m pip install -U \"tree-sitter-yaml @ git+https://github.com/tree-sitter-grammars/tree-sitter-yaml.git@v0.7.1\" && python -m pip install -U aider-chat",
 }
 
 var QodoCLI = CLI{

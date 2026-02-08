@@ -1,8 +1,22 @@
 FROM alpine:3.19
 
-RUN apk add --no-cache ca-certificates go curl bash python3 py3-pip python3-dev nodejs-current npm build-base linux-headers rust cargo tree-sitter tree-sitter-dev \
+ARG TREE_SITTER_VERSION=0.24.7
+
+RUN apk add --no-cache ca-certificates go curl bash python3 py3-pip python3-dev nodejs-current npm build-base linux-headers rust cargo git gcompat libc6-compat \
   && update-ca-certificates \
-  && ln -sf /usr/bin/python3 /usr/bin/python
+  && ln -sf /usr/bin/python3 /usr/bin/python \
+  && curl -fsSL "https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TREE_SITTER_VERSION}.tar.gz" \
+  | tar -xz -C /tmp \
+  && cd "/tmp/tree-sitter-${TREE_SITTER_VERSION}" \
+  && make \
+  && make install \
+  && install -d '/usr/local/include/tree_sitter' \
+  && cp -f lib/include/tree_sitter/*.h '/usr/local/include/tree_sitter/' \
+  && cp -f lib/src/*.h '/usr/local/include/tree_sitter/' \
+  && if [ -d lib/src/tree_sitter ]; then cp -f lib/src/tree_sitter/*.h '/usr/local/include/tree_sitter/'; fi \
+  && cd / \
+  && rm -rf "/tmp/tree-sitter-${TREE_SITTER_VERSION}" \
+  && cargo install --locked --root /usr/local tree-sitter-cli --version 0.24.7
 
 ENV PATH="/usr/local/go/bin:${PATH}"
 
