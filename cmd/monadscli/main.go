@@ -8,14 +8,28 @@ import (
 	"time"
 
 	"github.com/ryanmontgomery/MonadsCLI/internal/cli"
+	"github.com/ryanmontgomery/MonadsCLI/internal/installer"
 	"github.com/ryanmontgomery/MonadsCLI/internal/report"
 	"github.com/ryanmontgomery/MonadsCLI/internal/runner"
 )
 
 func main() {
 	cli.Execute([]cli.Command{
+		installCommand(),
 		runCommand(),
 	})
+}
+
+func installCommand() cli.Command {
+	return cli.Command{
+		Name:        "install",
+		Description: "Install one or more supported CLIs",
+		Run: func(fs *flag.FlagSet) error {
+			names := fs.Args()
+			_, err := installer.InstallCLIs(names)
+			return err
+		},
+	}
 }
 
 func runCommand() cli.Command {
