@@ -2,9 +2,24 @@
 
 Manage settings with the `settings` subcommand.
 
+Available settings:
+
+### Agentic CLIs
+
+- ANTHROPIC_API_KEY — [Get key](https://console.anthropic.com/settings/keys)
+- CURSOR_API_KEY — [Get key](https://cursor.com/dashboard)
+- GEMINI_API_KEY — [Get key](https://aistudio.google.com/app/apikey)
+- GH_TOKEN — [Get key](https://github.com/settings/personal-access-tokens/new)
+- OPENAI_API_KEY — [Get key](https://platform.openai.com/api-keys)
+- QODO_API_KEY — [Get key](https://app.qodo.ai/)
+
+### Lucidchart
+
+- LUCIDCHART_API_KEY — [Get key](https://lucid.app/developer#/apikeys)
+
 ## Read settings
 
-Print settings as JSON:
+Print settings as `.env` format:
 
 ```bash
 monadscli settings get

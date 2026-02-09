@@ -30,7 +30,7 @@ var ClaudeCLI = CLI{
 var CopilotCLI = CLI{
 	Name:    "GitHub Copilot CLI",
 	KeyURL:  "https://github.com/settings/personal-access-tokens/new",
-	KeyENV:  "",
+	KeyENV:  "GH_TOKEN",
 	Command: "copilot",
 	Prompt:  "copilot",
 	Install: "npm install -g @github/copilot",
@@ -48,7 +48,7 @@ var AiderCLI = CLI{
 var QodoCLI = CLI{
 	Name:    "Qodo Gen CLI",
 	KeyURL:  "https://app.qodo.ai/",
-	KeyENV:  "",
+	KeyENV:  "QODO_API_KEY",
 	Command: "qodo",
 	Prompt:  "qodo chat",
 	Install: "npm install -g @qodo/gen",

@@ -333,6 +333,17 @@ func deriveKey(value string) []byte {
 func settingsKeys() []string {
 	keys := make([]string, 0, len(types.AllCLIs))
 	seen := map[string]struct{}{}
+	for _, key := range extraSettingsKeys {
+		name := strings.TrimSpace(key)
+		if name == "" {
+			continue
+		}
+		if _, ok := seen[name]; ok {
+			continue
+		}
+		seen[name] = struct{}{}
+		keys = append(keys, name)
+	}
 	for _, cli := range types.AllCLIs {
 		if strings.TrimSpace(cli.KeyENV) == "" {
 			continue
@@ -352,6 +363,10 @@ func settingsKeys() []string {
 
 	sort.Strings(keys)
 	return keys
+}
+
+var extraSettingsKeys = []string{
+	"LUCIDCHART_API_KEY",
 }
 
 func settingsKeySet() map[string]struct{} {
