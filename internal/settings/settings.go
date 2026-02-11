@@ -367,6 +367,14 @@ func settingsKeys() []string {
 
 var extraSettingsKeys = []string{
 	"LUCIDCHART_API_KEY",
+	"LUCID_OAUTH_CLIENT_ID",
+	"LUCID_OAUTH_CLIENT_SECRET",
+	"LUCID_OAUTH_REDIRECT_URL",
+	"LUCID_OAUTH_SCOPES",
+	"LUCID_OAUTH_PROMPT",
+	"LUCID_OAUTH_AUTH_URL",
+	"LUCID_OAUTH_TOKEN_URL",
+	"LUCID_OAUTH_STATE",
 }
 
 func settingsKeySet() map[string]struct{} {

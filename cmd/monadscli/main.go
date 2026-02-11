@@ -1,5 +1,7 @@
 package main
 
+//go:generate go run github.com/ryanmontgomery/MonadsCLI/cmd/envembedgen
+
 import (
 	"errors"
 	"flag"
@@ -19,6 +21,8 @@ import (
 func main() {
 	cli.Execute([]cli.Command{
 		installCommand(),
+		loginCommand(),
+		lucidCommand(),
 		runCommand(),
 		settingsCommand(),
 	})
