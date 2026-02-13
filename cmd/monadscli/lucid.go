@@ -12,6 +12,7 @@ import (
 	"github.com/ryanmontgomery/MonadsCLI/internal/cli"
 	"github.com/ryanmontgomery/MonadsCLI/internal/envembed"
 	"github.com/ryanmontgomery/MonadsCLI/internal/lucid"
+	"github.com/ryanmontgomery/MonadsCLI/internal/settings"
 )
 
 func lucidCommand() cli.Command {
@@ -26,6 +27,8 @@ func lucidCommand() cli.Command {
 			switch args[0] {
 			case "login":
 				return lucidLogin(args[1:])
+			case "document":
+				return lucidDocument(args[1:])
 			default:
 				return fmt.Errorf("unknown lucid subcommand: %s", args[0])
 			}
@@ -157,5 +160,40 @@ func lucidLogin(args []string) error {
 		fmt.Fprintln(os.Stdout, token.RefreshToken)
 	}
 
+	return nil
+}
+
+func lucidDocument(args []string) error {
+	fs := flag.NewFlagSet("lucid document", flag.ContinueOnError)
+	fs.SetOutput(os.Stdout)
+
+	var documentID string
+	fs.StringVar(&documentID, "id", "", "Lucidchart document ID")
+
+	if err := fs.Parse(args); err != nil {
+		if errors.Is(err, flag.ErrHelp) {
+			return nil
+		}
+		return err
+	}
+	if documentID == "" {
+		return fmt.Errorf("missing --id (document ID)")
+	}
+
+	s, err := settings.ToEnv()
+	if err != nil {
+		return fmt.Errorf("load settings: %w", err)
+	}
+	apiKey := strings.TrimSpace(s["LUCIDCHART_API_KEY"])
+	if apiKey == "" {
+		return fmt.Errorf("LUCIDCHART_API_KEY not set in settings (use monadscli settings set LUCIDCHART_API_KEY=...)")
+	}
+
+	body, err := lucid.GetDocument(context.Background(), documentID, apiKey)
+	if err != nil {
+		return err
+	}
+
+	fmt.Fprintln(os.Stdout, string(body))
 	return nil
 }

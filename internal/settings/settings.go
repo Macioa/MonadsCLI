@@ -213,20 +213,21 @@ func settingsKeyPath() (string, error) {
 }
 
 func settingsDir() (string, error) {
-	exe, err := os.Executable()
-	if err == nil && exe != "" {
-		return filepath.Dir(exe), nil
-	}
-
 	home, homeErr := os.UserHomeDir()
 	if homeErr != nil {
-		if err != nil {
-			return "", err
-		}
 		return "", homeErr
 	}
 
-	return filepath.Join(home, "bin"), nil
+	exe, err := os.Executable()
+	if err == nil && exe != "" {
+		dir := filepath.Dir(exe)
+		// Use stable home dir when running via "go run" (temp path varies per run)
+		if !strings.Contains(dir, "go-build") {
+			return dir, nil
+		}
+	}
+
+	return filepath.Join(home, ".config", "monadscli"), nil
 }
 
 func encrypt(plain []byte) ([]byte, error) {

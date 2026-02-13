@@ -1,0 +1,91 @@
+{
+  "id": "35fbd25a-3992-41c0-9d47-e1f9c86ea116",
+  "title": "Blank diagram",
+  "product": "lucidchart",
+  "pages": [
+    {
+      "id": "0_0",
+      "title": "Page 1",
+      "index": 0,
+      "items": {
+        "shapes": [
+          {
+            "id": "CXSt0TzudBZw",
+            "class": "ProcessBlock",
+            "textAreas": [{"label": "Text", "text": "Process"}],
+            "customData": [{"key": "TestProp", "value": "Test"}],
+            "linkedData": []
+          },
+          {
+            "id": "vXXtFT8N6j~i",
+            "class": "DecisionBlock",
+            "textAreas": [{"label": "Text", "text": "Decision"}],
+            "customData": [],
+            "linkedData": []
+          },
+          {
+            "id": "pkUt-kq8-kH_",
+            "class": "PredefinedProcessBlock",
+            "textAreas": [{"label": "Text", "text": "Predefined process"}],
+            "customData": [],
+            "linkedData": []
+          },
+          {
+            "id": "RXXtgxciaUc-",
+            "class": "PredefinedProcessBlock",
+            "textAreas": [{"label": "Text", "text": "Predefined process"}],
+            "customData": [],
+            "linkedData": []
+          },
+          {
+            "id": "NXXt8UuE_PDl",
+            "class": "ProcessBlock",
+            "textAreas": [{"label": "Text", "text": "Process"}],
+            "customData": [],
+            "linkedData": []
+          }
+        ],
+        "lines": [
+          {
+            "id": "eXXtpdvFd-qc",
+            "endpoint1": {"style": "None", "connectedTo": "CXSt0TzudBZw"},
+            "endpoint2": {"style": "Arrow", "connectedTo": "pkUt-kq8-kH_"},
+            "textAreas": [],
+            "customData": [],
+            "linkedData": []
+          },
+          {
+            "id": ".XXtV.GIQOho",
+            "endpoint1": {"style": "None", "connectedTo": "vXXtFT8N6j~i"},
+            "endpoint2": {"style": "Arrow", "connectedTo": "RXXtgxciaUc-"},
+            "textAreas": [{"label": "Text", "text": "Yes"}],
+            "customData": [],
+            "linkedData": []
+          },
+          {
+            "id": "yXXt7lk7H7Zm",
+            "endpoint1": {"style": "None", "connectedTo": "pkUt-kq8-kH_"},
+            "endpoint2": {"style": "Arrow", "connectedTo": "vXXtFT8N6j~i"},
+            "textAreas": [],
+            "customData": [],
+            "linkedData": []
+          },
+          {
+            "id": "0XXtNWFVwK0A",
+            "endpoint1": {"style": "None", "connectedTo": "vXXtFT8N6j~i"},
+            "endpoint2": {"style": "Arrow", "connectedTo": "NXXt8UuE_PDl"},
+            "textAreas": [{"label": "Text", "text": "No"}],
+            "customData": [],
+            "linkedData": []
+          }
+        ],
+        "groups": [],
+        "layers": []
+      },
+      "customData": [],
+      "linkedData": []
+    }
+  ],
+  "data": {"collections": []},
+  "accountId": 213085344
+}
