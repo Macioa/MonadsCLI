@@ -34,3 +34,11 @@ type Node struct {
 	// Children: route name -> child node (route names come from line labels)
 	Children map[string]*Node `json:"children,omitempty"`
 }
+
+// Document contains document metadata and a root node tree.
+type Document struct {
+	ID     string `json:"id,omitempty"`
+	Title  string `json:"title,omitempty"`
+	Status string `json:"status,omitempty"`
+	Root   *Node  `json:"root,omitempty"`
+}
