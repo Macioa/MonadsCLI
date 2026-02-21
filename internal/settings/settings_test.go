@@ -29,7 +29,8 @@ func TestFromJSONAndGet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Get: %v", err)
 	}
-	expectedOut := "CURSOR_API_KEY=def\nGEMINI_API_KEY=abc"
+	// Get() merges default values; output includes DEFAULT_* when not set
+	expectedOut := "CURSOR_API_KEY=def\nDEFAULT_CLI=CURSOR\nDEFAULT_RETRY_CLI=CURSOR\nDEFAULT_RETRY_COUNT=3\nDEFAULT_TIMEOUT=600\nDEFAULT_VALIDATE_CLI=CURSOR\nGEMINI_API_KEY=abc"
 	if string(payload) != expectedOut {
 		t.Fatalf("Get output mismatch: %q", string(payload))
 	}
@@ -56,6 +57,10 @@ func TestFromJSONAndGet(t *testing.T) {
 func TestFromEnvRoundTrip(t *testing.T) {
 	t.Setenv(settingsKeyEnv, "test-key")
 	clearSettingsFiles(t)
+	// Unset default keys so env only has the two we set (prevents bleed from ToEnv in other tests)
+	for k := range defaultValues {
+		_ = os.Unsetenv(k)
+	}
 
 	t.Setenv("GEMINI_API_KEY", "env-abc")
 	t.Setenv("CURSOR_API_KEY", "env-def")
@@ -133,9 +138,71 @@ SHOULD_SKIP=skip
 		t.Fatalf("read output: %v", err)
 	}
 
-	expectedOut := "CURSOR_API_KEY=def\nGEMINI_API_KEY=\"abc 123\""
+	// ToFile() merges default values
+	expectedOut := "CURSOR_API_KEY=def\nDEFAULT_CLI=CURSOR\nDEFAULT_RETRY_CLI=CURSOR\nDEFAULT_RETRY_COUNT=3\nDEFAULT_TIMEOUT=600\nDEFAULT_VALIDATE_CLI=CURSOR\nGEMINI_API_KEY=\"abc 123\""
 	if string(output) != expectedOut {
 		t.Fatalf("output mismatch: %q", string(output))
+	}
+}
+
+func TestDefaultValues(t *testing.T) {
+	t.Setenv(settingsKeyEnv, "test-key")
+	clearSettingsFiles(t)
+
+	_, err := FromJSON(`{"GEMINI_API_KEY":"x"}`)
+	if err != nil {
+		t.Fatalf("FromJSON: %v", err)
+	}
+
+	effective, err := ToEnv()
+	if err != nil {
+		t.Fatalf("ToEnv: %v", err)
+	}
+
+	for key, want := range defaultValues {
+		if got := effective[key]; got != want {
+			t.Errorf("default %s: got %q, want %q", key, got, want)
+		}
+	}
+	if got := os.Getenv("DEFAULT_CLI"); got != "CURSOR" {
+		t.Errorf("after ToEnv DEFAULT_CLI env: got %q, want CURSOR", got)
+	}
+	if got := os.Getenv("DEFAULT_TIMEOUT"); got != "600" {
+		t.Errorf("after ToEnv DEFAULT_TIMEOUT env: got %q, want 600", got)
+	}
+}
+
+func TestCLILoginStatus(t *testing.T) {
+	t.Setenv(settingsKeyEnv, "test-key")
+	clearSettingsFiles(t)
+
+	// Only Gemini in settings -> only Gemini CLI reported logged in
+	_, err := FromJSON(`{"GEMINI_API_KEY":"abc123"}`)
+	if err != nil {
+		t.Fatalf("FromJSON: %v", err)
+	}
+	status, err := CLILoginStatus()
+	if err != nil {
+		t.Fatalf("CLILoginStatus: %v", err)
+	}
+	if !status["Gemini CLI"] {
+		t.Error("Gemini CLI should be logged in when GEMINI_API_KEY is in settings")
+	}
+	for _, name := range []string{"Cursor CLI", "Claude CLI", "GitHub Copilot CLI", "Aider", "Qodo Gen CLI"} {
+		if status[name] {
+			t.Errorf("%s should not be logged in when only GEMINI_API_KEY is in settings", name)
+		}
+	}
+
+	// Empty settings -> none logged in
+	clearSettingsFiles(t)
+	_, _ = FromJSON(`{}`)
+	status, err = CLILoginStatus()
+	if err != nil {
+		t.Fatalf("CLILoginStatus: %v", err)
+	}
+	if status["Gemini CLI"] {
+		t.Error("Gemini CLI should not be logged in when settings are empty")
 	}
 }
 

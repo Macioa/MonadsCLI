@@ -21,6 +21,9 @@ func SelectCLIs(names []string) ([]CLI, error) {
 	for _, cli := range AllCLIs {
 		index[normalizeCLIKey(cli.Name)] = cli
 		index[normalizeCLIKey(cli.Command)] = cli
+		if cli.Codename != "" {
+			index[normalizeCLIKey(cli.Codename)] = cli
+		}
 	}
 
 	selected := make([]CLI, 0, len(names))

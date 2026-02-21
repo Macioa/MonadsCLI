@@ -25,17 +25,27 @@ const (
 	settingsKeyEnv   = "MONADSCLI_SETTINGS_KEY"
 )
 
+// Default values for behavior settings (must match readme/settings.md).
+var defaultValues = map[string]string{
+	"DEFAULT_CLI":         "CURSOR",
+	"DEFAULT_TIMEOUT":     "600",
+	"DEFAULT_RETRY_CLI":   "CURSOR",
+	"DEFAULT_RETRY_COUNT": "3",
+	"DEFAULT_VALIDATE_CLI": "CURSOR",
+}
+
 // Settings defines a map of env keys to values.
 type Settings map[string]string
 
 // Get returns settings formatted as .env content read from the encrypted file.
+// Stored values are merged with defaultValues so unset behavior keys appear in the output.
 func Get() ([]byte, error) {
 	settings, err := loadSettings()
 	if err != nil {
 		return nil, err
 	}
-
-	return []byte(formatEnv(settings)), nil
+	effective := applyDefaults(settings)
+	return []byte(formatEnv(effective)), nil
 }
 
 // Set writes the provided settings to the encrypted settings file.
@@ -109,33 +119,62 @@ func FromJSON(payload string) (Settings, error) {
 }
 
 // ToEnv loads settings and applies them to the current environment.
+// Stored values are merged with defaultValues so unset behavior keys get the documented default.
 func ToEnv() (Settings, error) {
 	settings, err := loadSettings()
 	if err != nil {
 		return nil, err
 	}
-
-	for key, value := range settings {
+	effective := applyDefaults(settings)
+	for key, value := range effective {
 		if err := os.Setenv(key, value); err != nil {
 			return nil, err
 		}
 	}
+	return effective, nil
+}
 
-	return settings, nil
+// CLILoginStatus returns which supported CLIs have credentials configured.
+// It uses only the encrypted settings file (loadSettings): a CLI is logged in
+// if at least one of its KeyENV keys is present in settings and non-empty.
+// The current process environment is not consulted.
+func CLILoginStatus() (map[string]bool, error) {
+	settings, err := loadSettings()
+	if err != nil {
+		return nil, err
+	}
+	out := make(map[string]bool)
+	for _, cli := range types.AllCLIs {
+		loggedIn := false
+		if strings.TrimSpace(cli.KeyENV) != "" {
+			for _, key := range strings.Split(cli.KeyENV, ",") {
+				name := strings.TrimSpace(key)
+				if name == "" {
+					continue
+				}
+				if v := strings.TrimSpace(settings[name]); v != "" {
+					loggedIn = true
+					break
+				}
+			}
+		}
+		out[cli.Name] = loggedIn
+	}
+	return out, nil
 }
 
 // ToFile writes settings to a .env-style file at the given path.
+// Stored values are merged with defaultValues so the file contains effective values.
 func ToFile(path string) (Settings, error) {
 	settings, err := loadSettings()
 	if err != nil {
 		return nil, err
 	}
-
-	if err := writeEnvFile(path, settings); err != nil {
+	effective := applyDefaults(settings)
+	if err := writeEnvFile(path, effective); err != nil {
 		return nil, err
 	}
-
-	return settings, nil
+	return effective, nil
 }
 
 func loadSettings() (Settings, error) {
@@ -367,6 +406,11 @@ func settingsKeys() []string {
 }
 
 var extraSettingsKeys = []string{
+	"DEFAULT_CLI",
+	"DEFAULT_TIMEOUT",
+	"DEFAULT_RETRY_CLI",
+	"DEFAULT_RETRY_COUNT",
+	"DEFAULT_VALIDATE_CLI",
 	"LUCIDCHART_API_KEY",
 	"LUCID_OAUTH_CLIENT_ID",
 	"LUCID_OAUTH_CLIENT_SECRET",
@@ -376,6 +420,25 @@ var extraSettingsKeys = []string{
 	"LUCID_OAUTH_AUTH_URL",
 	"LUCID_OAUTH_TOKEN_URL",
 	"LUCID_OAUTH_STATE",
+}
+
+// applyDefaults returns a copy of settings with defaultValues filled in for empty keys.
+func applyDefaults(settings Settings) Settings {
+	out := make(Settings, len(settings)+len(defaultValues))
+	for k, v := range settings {
+		out[k] = v
+	}
+	for k, v := range defaultValues {
+		if strings.TrimSpace(out[k]) == "" {
+			out[k] = v
+		}
+	}
+	return out
+}
+
+// DefaultFor returns the documented default for a key, or "" if the key has no default.
+func DefaultFor(key string) string {
+	return defaultValues[key]
 }
 
 func settingsKeySet() map[string]struct{} {
