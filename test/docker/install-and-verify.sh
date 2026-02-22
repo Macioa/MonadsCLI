@@ -13,7 +13,8 @@ gemini --version
 # agent --version  # skip on Alpine: cursor-agent bundled Node is glibc-only, fails with fcntl64 symbol not found
 if [[ ! -f /etc/alpine-release ]]; then agent --version; fi
 claude -v
-copilot --version
+# copilot --version  # skip on Alpine: @github/copilot-linux-x64 native binary is glibc-only, fails with fcntl64 symbol not found
+if [[ ! -f /etc/alpine-release ]]; then copilot --version; fi
 
 if command -v aider >/dev/null 2>&1; then
   aider --version
