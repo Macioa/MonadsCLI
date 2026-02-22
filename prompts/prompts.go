@@ -27,3 +27,10 @@ func ProcessResponseInstruction() string {
 func DecisionResponseInstruction() string {
 	return "Respond with only a JSON object with keys: choices (array of strings), answer (string), reasons (array of strings)."
 }
+
+// ValidationResponseInstruction returns prompt text that instructs the CLI to respond
+// with a JSON object matching ValidationResponse (fully_completed, partially_completed, should_retry, warnings).
+// Used when running the validation prompt after a node completes.
+func ValidationResponseInstruction() string {
+	return "Respond with only a JSON object with keys: fully_completed (boolean), partially_completed (boolean), should_retry (boolean), warnings (array of strings)."
+}

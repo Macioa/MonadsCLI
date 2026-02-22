@@ -162,3 +162,98 @@ func TestRunNode_ErrorPaths(t *testing.T) {
 		}
 	})
 }
+
+func TestShouldValidate(t *testing.T) {
+	t.Run("nil", func(t *testing.T) {
+		if ShouldValidate(nil) {
+			t.Error("ShouldValidate(nil) want false")
+		}
+	})
+	t.Run("no_validation_prompt_skipped", func(t *testing.T) {
+		n := &types.ProcessedNode{Prompt: "P", ValidatePrompt: ""}
+		if ShouldValidate(n) {
+			t.Error("ShouldValidate(empty ValidatePrompt) want false")
+		}
+	})
+	t.Run("has_children_skipped", func(t *testing.T) {
+		n := &types.ProcessedNode{Prompt: "P", ValidatePrompt: "Check it", Children: map[string]*types.ProcessedNode{"A": {}}}
+		if ShouldValidate(n) {
+			t.Error("ShouldValidate(node with children) want false")
+		}
+	})
+	t.Run("childless_with_validate_prompt", func(t *testing.T) {
+		n := &types.ProcessedNode{Prompt: "P", ValidatePrompt: "Did it follow instructions?"}
+		if !ShouldValidate(n) {
+			t.Error("ShouldValidate(childless with ValidatePrompt) want true")
+		}
+	})
+}
+
+func TestResolveValidateCLI(t *testing.T) {
+	t.Run("node_validate_cli", func(t *testing.T) {
+		n := &types.ProcessedNode{ValidateCLI: "GEMINI"}
+		cli, err := ResolveValidateCLI(n, "CURSOR")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if cli.Codename != "GEMINI" {
+			t.Errorf("ResolveValidateCLI = codename %q, want GEMINI", cli.Codename)
+		}
+	})
+	t.Run("default_validate_cli", func(t *testing.T) {
+		n := &types.ProcessedNode{}
+		cli, err := ResolveValidateCLI(n, "CURSOR")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if cli.Codename != "CURSOR" {
+			t.Errorf("ResolveValidateCLI = codename %q, want CURSOR", cli.Codename)
+		}
+	})
+	t.Run("no_validate_cli", func(t *testing.T) {
+		n := &types.ProcessedNode{}
+		_, err := ResolveValidateCLI(n, "")
+		if err != ErrNoValidateCLI {
+			t.Errorf("ResolveValidateCLI(no default) err = %v, want ErrNoValidateCLI", err)
+		}
+	})
+	t.Run("unknown_codename", func(t *testing.T) {
+		n := &types.ProcessedNode{ValidateCLI: "UNKNOWN"}
+		_, err := ResolveValidateCLI(n, "CURSOR")
+		if err == nil {
+			t.Error("ResolveValidateCLI(unknown) want error")
+		}
+	})
+}
+
+func TestBuildValidatePrompt(t *testing.T) {
+	t.Run("includes_validate_prompt_and_context", func(t *testing.T) {
+		n := &types.ProcessedNode{Prompt: "Do X", ValidatePrompt: "Check that X was done."}
+		got := BuildValidatePrompt(n, "output from node")
+		if !strings.Contains(got, "Check that X was done.") {
+			t.Errorf("BuildValidatePrompt missing validate text: %q", got)
+		}
+		if !strings.Contains(got, "Do X") {
+			t.Errorf("BuildValidatePrompt missing original prompt: %q", got)
+		}
+		if !strings.Contains(got, "output from node") {
+			t.Errorf("BuildValidatePrompt missing node output: %q", got)
+		}
+		if !strings.Contains(got, "fully_completed") || !strings.Contains(got, "should_retry") {
+			t.Errorf("BuildValidatePrompt should include validation response instruction: %q", got)
+		}
+	})
+	t.Run("nil", func(t *testing.T) {
+		got := BuildValidatePrompt(nil, "out")
+		if got != "" {
+			t.Errorf("BuildValidatePrompt(nil) = %q, want empty", got)
+		}
+	})
+	t.Run("empty_validate_prompt", func(t *testing.T) {
+		n := &types.ProcessedNode{Prompt: "P", ValidatePrompt: ""}
+		got := BuildValidatePrompt(n, "out")
+		if got != "" {
+			t.Errorf("BuildValidatePrompt(empty ValidatePrompt) = %q, want empty", got)
+		}
+	})
+}
