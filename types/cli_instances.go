@@ -6,7 +6,7 @@ var GeminiCLI = CLI{
 	KeyENV:   "GEMINI_API_KEY",
 	Codename: "GEMINI",
 	Command:  "gemini",
-	Prompt:   "gemini",
+	Prompt:   "gemini --yolo -p \"<prompt>\"",
 	Install:  "npm install -g @google/gemini-cli",
 }
 
@@ -16,7 +16,7 @@ var CursorCLI = CLI{
 	KeyENV:   "CURSOR_API_KEY",
 	Codename: "CURSOR",
 	Command:  "agent",
-	Prompt:   "agent \"<prompt>\"",
+	Prompt:   "agent -p --force \"<prompt>\"",
 	Install:  "curl https://cursor.com/install -fsS | bash",
 }
 
@@ -26,7 +26,7 @@ var ClaudeCLI = CLI{
 	KeyENV:   "ANTHROPIC_API_KEY",
 	Codename: "CLAUDE",
 	Command:  "claude",
-	Prompt:   "claude -p \"<prompt>\"",
+	Prompt:   "claude -p \"<prompt>\" --dangerously-skip-permissions",
 	Install:  "npm install -g @anthropic-ai/claude-code",
 }
 
@@ -36,7 +36,7 @@ var CopilotCLI = CLI{
 	KeyENV:   "GH_TOKEN",
 	Codename: "COPILOT",
 	Command:  "copilot",
-	Prompt:   "copilot",
+	Prompt:   "copilot -p \"<prompt>\" --allow-all-tools",
 	Install:  "npm install -g @github/copilot",
 }
 
@@ -46,7 +46,7 @@ var AiderCLI = CLI{
 	KeyENV:   "OPENAI_API_KEY, ANTHROPIC_API_KEY",
 	Codename: "AIDER",
 	Command:  "aider",
-	Prompt:   "aider <file1> <file2>",
+	Prompt:   "aider --yes -m \"<prompt>\"",
 	Install:  "python -m pip install -U \"tree-sitter-yaml @ git+https://github.com/tree-sitter-grammars/tree-sitter-yaml.git@v0.7.1\" && python -m pip install -U aider-chat",
 }
 
@@ -56,7 +56,7 @@ var QodoCLI = CLI{
 	KeyENV:   "QODO_API_KEY",
 	Codename: "QODO",
 	Command:  "qodo",
-	Prompt:   "qodo chat",
+	Prompt:   "qodo chat -y",
 	Install:  "npm install -g @qodo/gen",
 }
 
