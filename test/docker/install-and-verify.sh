@@ -10,7 +10,8 @@ python3 -m pip install --upgrade pip setuptools wheel --quiet
 monadscli install
 
 gemini --version
-agent --version
+# agent --version  # skip on Alpine: cursor-agent bundled Node is glibc-only, fails with fcntl64 symbol not found
+if [[ ! -f /etc/alpine-release ]]; then agent --version; fi
 claude -v
 copilot --version
 
