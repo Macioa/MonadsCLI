@@ -20,19 +20,19 @@ Both **tags** and **metadata variables** are **case-insensitive** and **snake/ca
 
 **1. Open panel** – Select a process node and open the context panel (right side of the canvas).
 
-<p align="center"><img src="https://raw.githubusercontent.com/Macioa/MonadsCLI/main/images/context_panel.png" alt="Open the context panel" /></p>
+<p align="center"><img src="../images/context_panel.png" alt="Open the context panel" /></p>
 
 **2. Add tags** – Click **Add tag** to add a new tag to the node. Click **Data** to access metadata variables.
 
-<p align="center"><img src="https://raw.githubusercontent.com/Macioa/MonadsCLI/main/images/metadata.png" alt="Add tags" /></p>
+<p align="center"><img src="../images/metadata.png" alt="Add tags" /></p>
 
 **3. Add metadata variables if not present** – If no variables exist, click **New data field** to add the first one.
 
-<p align="center"><img src="https://raw.githubusercontent.com/Macioa/MonadsCLI/main/images/add_vars.png" alt="Add metadata variables if not present" /></p>
+<p align="center"><img src="../images/add_vars.png" alt="Add metadata variables if not present" /></p>
 
 **4. Add or edit metadata variables** – Click to add new variables or edit existing variable names and values.
 
-<p align="center"><img src="https://raw.githubusercontent.com/Macioa/MonadsCLI/main/images/variables.png" alt="Add or edit metadata variables" /></p>
+<p align="center"><img src="../images/variables.png" alt="Add or edit metadata variables" /></p>
 
 ---
 

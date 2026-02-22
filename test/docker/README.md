@@ -23,9 +23,9 @@ docker run --rm monadscli-test:ubuntu
 The PowerShell image runs under amd64 emulation on Apple Silicon.
 
 ### Go version override
-Most Dockerfiles accept `GO_VERSION` (Alpine uses the distro `go` package):
+All Dockerfiles install Go from go.dev and accept `GO_VERSION` (default: 1.24.0):
 ```bash
 docker build -f test/docker/Dockerfile.debian \
-  --build-arg GO_VERSION=1.20.13 \
+  --build-arg GO_VERSION=1.24.0 \
   -t monadscli-test:debian .
 ```

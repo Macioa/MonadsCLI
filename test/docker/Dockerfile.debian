@@ -1,19 +1,15 @@
 FROM debian:bookworm-slim
 
-ARG GO_VERSION=1.20.13
+ARG GO_VERSION=1.24.0
 
 RUN apt-get update \
-  && apt-get install -y --no-install-recommends ca-certificates curl tar gzip gnupg \
+  && apt-get install -y --no-install-recommends ca-certificates curl git tar gzip gnupg \
   && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
   && apt-get install -y --no-install-recommends nodejs python3 python3-pip python-is-python3 \
   && rm -rf /var/lib/apt/lists/*
 
 RUN arch="$(uname -m)" \
-  && case "$arch" in \
-    x86_64) go_arch="amd64" ;; \
-    aarch64|arm64) go_arch="arm64" ;; \
-    *) echo "unsupported arch: $arch" && exit 1 ;; \
-  esac \
+  && case "$arch" in x86_64) go_arch="amd64" ;; aarch64|arm64) go_arch="arm64" ;; *) echo "unsupported arch: $arch" && exit 1 ;; esac \
   && curl -fsSL "https://go.dev/dl/go${GO_VERSION}.linux-${go_arch}.tar.gz" \
   | tar -C /usr/local -xz
 
