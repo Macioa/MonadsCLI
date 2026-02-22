@@ -4,6 +4,9 @@ set -euo pipefail
 export PATH="$HOME/.local/bin:$PATH"
 export PIP_BREAK_SYSTEM_PACKAGES=1
 
+# tree-sitter-yaml (aider dep) needs modern setuptools; distro package is too old
+python3 -m pip install --upgrade pip setuptools wheel --quiet
+
 monadscli install
 
 gemini --version

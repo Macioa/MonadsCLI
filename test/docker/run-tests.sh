@@ -12,8 +12,17 @@ run_tests() {
     platform_args=(--platform "$platform")
   fi
 
+  # Verify install succeeded (CLI tools present) and Go tests pass
   docker run --rm "${platform_args[@]}" "monadscli-test:${name}-installed" \
-    /bin/sh -c "cd /app && go test ./..."
+    /bin/sh -c '
+      set -e
+      agent --version
+      gemini --version
+      claude -v
+      copilot --version
+      qodo --version
+      cd /app && go test ./...
+    '
 }
 
 run_tests ubuntu

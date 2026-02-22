@@ -4,7 +4,7 @@
 
 ---
 
-## Adding Tags and Variables in Lucidchart
+# Adding Tags and Variables in Lucidchart
 
 <p align="center"><strong>1. Open panel</strong> – Select a process node and open the context panel (right side of the canvas).</p>
 
@@ -24,7 +24,7 @@
 
 ---
 
-## Tags vs. Metadata Variables
+# Tags vs. Metadata Variables
 
 | | **Tags** | **Metadata variables** |
 |---|----------|-------------------------|
@@ -32,11 +32,9 @@
 | **Where to set them** | In the **Tags** section of the node's context panel, with a process node selected. | In the **Data** section of the node's context panel, with a process node selected. |
 | **Differences** | Visible from chart with color codes. No data values. | Visible only from data context panel. Allows custom data values. |
 
-Both **tags** and **metadata variables** are **case-insensitive** and **snake/camel-safe**. For example, `NoValidation`, `novalidation`, and `no_validation` are equivalent tags; `validate_cli`, `validateCli`, and `Validate_CLI` are equivalent variable names. Variable values (CLI codenames) are normalized to uppercase; freeform values are trimmed of surrounding whitespace.
-
 ---
 
-## Tags
+# Tags
 
 | Tag | Effect |
 |-----|--------|
@@ -47,16 +45,12 @@ Both **tags** and **metadata variables** are **case-insensitive** and **snake/ca
 
 ---
 
-## Metadata Variables
-
-Variables map to default settings. A node can override any default by setting the corresponding variable in its **Data** section.
+# Metadata Variables
 
 | Variable | Effect | Example value |
 |----------|--------|---------------|
-| **validate_cli** | Which CLI validates this node’s response | Same as above |
-| **retry_cli** | Which CLI retries after validation failure | Same as above |
+| **validate_cli** | Which CLI validates this node’s response | `GEMINI`, `CURSOR`, `CLAUDE`, `COPILOT`, `AIDER`, `QODO` |
+| **retry_cli** | Which CLI retries after validation failure | `GEMINI`, `CURSOR`, `CLAUDE`, `COPILOT`, `AIDER`, `QODO` |
 | **retries** | Maximum retries when validation fails | `3`, `5` |
 | **timeout** | Timeout in seconds for CLI operations (0 = use runner default) | `600`, `300` |
 | **validate_prompt** | Custom validation prompt text; ignored if node has **NoValidation** tag | `Did the model follow the instructions exactly?` |
-
-Unset variables fall back to your defaults; node values always override them. Variable names are case-insensitive and snake/camel-safe (e.g. `validate_cli`, `validateCli`, `Validate_CLI`). CLI codename values are normalized to uppercase.
