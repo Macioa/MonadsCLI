@@ -21,6 +21,10 @@ build_and_install() {
   docker run --name "$container" "${platform_args[@]}" "monadscli-test:${name}"
   docker commit "$container" "monadscli-test:${name}-installed" >/dev/null
   docker rm "$container" >/dev/null
+
+  # Free disk on CI: drop pre-install image (run-tests only needs -installed) and dangling layers
+  docker rmi "monadscli-test:${name}" 2>/dev/null || true
+  docker image prune -f
 }
 
 build_and_install ubuntu "$ROOT_DIR/test/docker/Dockerfile.ubuntu"
