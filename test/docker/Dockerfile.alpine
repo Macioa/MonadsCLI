@@ -3,7 +3,7 @@ FROM alpine:3.19
 ARG GO_VERSION=1.24.0
 ARG TREE_SITTER_VERSION=0.24.7
 
-RUN apk add --no-cache ca-certificates curl python3 py3-pip python3-dev nodejs-current npm build-base linux-headers rust cargo git gcompat libc6-compat \
+RUN apk add --no-cache bash ca-certificates curl python3 py3-pip python3-dev nodejs-current npm build-base linux-headers rust cargo git gcompat libc6-compat \
   && update-ca-certificates \
   && ln -sf /usr/bin/python3 /usr/bin/python \
   && curl -fsSL "https://github.com/tree-sitter/tree-sitter/archive/refs/tags/v${TREE_SITTER_VERSION}.tar.gz" \

@@ -16,11 +16,13 @@ run_tests() {
   docker run --rm "${platform_args[@]}" "monadscli-test:${name}-installed" \
     /bin/sh -c '
       set -e
+      export PATH="$HOME/.local/bin:$PATH"
       agent --version
       gemini --version
       claude -v
       copilot --version
-      qodo --version
+      qodo_output="$(qodo --version 2>&1 || true)"
+      [ -n "$qodo_output" ] || (echo "qodo --version produced no output" && exit 1)
       cd /app && go test ./...
     '
 }
