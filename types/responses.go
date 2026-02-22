@@ -28,22 +28,46 @@ type ValidationResponse struct {
 	Warnings          []string `json:"warnings"`
 }
 
+// parseJSONFromStdout unmarshals trimmed stdout into v; if that fails, tries the last
+// JSON object in the output (e.g. when the CLI echoes other text). Composable helper for response parsers.
+func parseJSONFromStdout(trimmed string, v interface{}) error {
+	if err := json.Unmarshal([]byte(trimmed), v); err == nil {
+		return nil
+	}
+	start := strings.LastIndex(trimmed, "{")
+	if start < 0 {
+		return json.Unmarshal([]byte(trimmed), v)
+	}
+	return json.Unmarshal([]byte(trimmed[start:]), v)
+}
+
+// ParseProcessResponse extracts and parses a ProcessResponse from CLI stdout.
+func ParseProcessResponse(stdout string) (ProcessResponse, error) {
+	var p ProcessResponse
+	trimmed := strings.TrimSpace(stdout)
+	if err := parseJSONFromStdout(trimmed, &p); err != nil {
+		return p, err
+	}
+	return p, nil
+}
+
+// ParseDecisionResponse extracts and parses a DecisionResponse from CLI stdout.
+func ParseDecisionResponse(stdout string) (DecisionResponse, error) {
+	var d DecisionResponse
+	trimmed := strings.TrimSpace(stdout)
+	if err := parseJSONFromStdout(trimmed, &d); err != nil {
+		return d, err
+	}
+	return d, nil
+}
+
 // ParseValidationResponse extracts and parses a ValidationResponse from CLI stdout.
 // It tries to unmarshal the trimmed output first; if that fails, it looks for the last
 // JSON object in the output (e.g. when the CLI echoes other text).
 func ParseValidationResponse(stdout string) (ValidationResponse, error) {
 	var v ValidationResponse
 	trimmed := strings.TrimSpace(stdout)
-	if err := json.Unmarshal([]byte(trimmed), &v); err == nil {
-		return v, nil
-	}
-	// Try to find a JSON object: last '{' to end
-	start := strings.LastIndex(trimmed, "{")
-	if start < 0 {
-		err := json.Unmarshal([]byte(trimmed), &v)
-		return v, err
-	}
-	if err := json.Unmarshal([]byte(trimmed[start:]), &v); err != nil {
+	if err := parseJSONFromStdout(trimmed, &v); err != nil {
 		return v, err
 	}
 	return v, nil

@@ -44,3 +44,60 @@ func TestParseValidationResponse(t *testing.T) {
 		}
 	})
 }
+
+func TestParseProcessResponse(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
+		stdout := `{"completed": true, "secs_taken": 1.5, "tokens_used": 100, "comments": ["done"]}`
+		p, err := ParseProcessResponse(stdout)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if !p.Completed {
+			t.Error("Completed want true")
+		}
+		if p.SecsTaken != 1.5 {
+			t.Errorf("SecsTaken = %v, want 1.5", p.SecsTaken)
+		}
+		if len(p.Comments) != 1 || p.Comments[0] != "done" {
+			t.Errorf("Comments = %v", p.Comments)
+		}
+	})
+	t.Run("with_trailing_text", func(t *testing.T) {
+		stdout := "log line\n{\"completed\": false, \"secs_taken\": 0, \"tokens_used\": 0, \"comments\": []}"
+		p, err := ParseProcessResponse(stdout)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if p.Completed {
+			t.Error("Completed want false")
+		}
+	})
+	t.Run("invalid", func(t *testing.T) {
+		_, err := ParseProcessResponse("not json")
+		if err == nil {
+			t.Error("ParseProcessResponse(invalid) want error")
+		}
+	})
+}
+
+func TestParseDecisionResponse(t *testing.T) {
+	t.Run("valid", func(t *testing.T) {
+		stdout := `{"choices": ["A","B"], "answer": "A", "reasons": ["faster"]}`
+		d, err := ParseDecisionResponse(stdout)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if d.Answer != "A" {
+			t.Errorf("Answer = %q, want A", d.Answer)
+		}
+		if len(d.Choices) != 2 || len(d.Reasons) != 1 {
+			t.Errorf("Choices = %v, Reasons = %v", d.Choices, d.Reasons)
+		}
+	})
+	t.Run("invalid", func(t *testing.T) {
+		_, err := ParseDecisionResponse("not json")
+		if err == nil {
+			t.Error("ParseDecisionResponse(invalid) want error")
+		}
+	})
+}

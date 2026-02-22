@@ -93,11 +93,27 @@ func escapeForShellPrompt(s string) string {
 	return strings.ReplaceAll(s, `"`, `\"`)
 }
 
-// RunOptions configures RunNode and validation.
+// RunOptions configures RunNode, validation, and retries.
 type RunOptions struct {
-	DefaultCLI        string // Codename when node.CLI is empty (e.g. from settings DEFAULT_CLI).
+	DefaultCLI         string // Codename when node.CLI is empty (e.g. from settings DEFAULT_CLI).
 	DefaultValidateCLI string // Codename when node.ValidateCLI is empty (e.g. from settings DEFAULT_VALIDATE_CLI).
-	WorkDir           string // Working directory for the shell command; empty means current dir.
+	DefaultRetryCLI    string // Codename when node.RetryCLI is empty (e.g. from settings DEFAULT_RETRY_CLI).
+	WorkDir            string // Working directory for the shell command; empty means current dir.
+}
+
+// shellRunner is set by tests to fake shell execution; when nil, the real runner is used.
+var shellRunner func(runner.CommandSpec) (runner.Result, error)
+
+// SetShellRunner sets the shell runner used by RunNode, RunValidation, and RunRetry (for tests). Pass nil to restore default.
+func SetShellRunner(f func(runner.CommandSpec) (runner.Result, error)) {
+	shellRunner = f
+}
+
+func runShell(spec runner.CommandSpec) (runner.Result, error) {
+	if shellRunner != nil {
+		return shellRunner(spec)
+	}
+	return runner.RunShellCommand(spec)
 }
 
 // RunNode runs the processed node: resolves CLI, builds prompt with response type, invokes CLI, returns result.
@@ -110,7 +126,7 @@ func RunNode(node *types.ProcessedNode, opts RunOptions) (runner.Result, error) 
 	fullPrompt := BuildRunPrompt(node)
 	command := BuildCommand(cli, fullPrompt)
 	shell, shellArgs := runner.DefaultShell()
-	return runner.RunShellCommand(runner.CommandSpec{
+	return runShell(runner.CommandSpec{
 		Shell:     shell,
 		ShellArgs: shellArgs,
 		Command:   command,
@@ -151,6 +167,89 @@ func ResolveValidateCLI(node *types.ProcessedNode, defaultValidateCodename strin
 
 // ErrNoValidateCLI is returned when the node has no ValidateCLI set and no default is provided.
 var ErrNoValidateCLI = errors.New("no validate CLI codename for node and no default")
+
+// ResolveRetryCLI returns the CLI to use for retries: node.RetryCLI if set, otherwise defaultRetryCodename.
+func ResolveRetryCLI(node *types.ProcessedNode, defaultRetryCodename string) (types.CLI, error) {
+	codename := ""
+	if node != nil {
+		codename = strings.TrimSpace(node.RetryCLI)
+	}
+	if codename == "" {
+		codename = strings.TrimSpace(defaultRetryCodename)
+	}
+	if codename == "" {
+		return types.CLI{}, ErrNoRetryCLI
+	}
+	list, err := types.SelectCLIs([]string{codename})
+	if err != nil {
+		return types.CLI{}, err
+	}
+	return list[0], nil
+}
+
+// ErrNoRetryCLI is returned when the node has no RetryCLI set and no default is provided.
+var ErrNoRetryCLI = errors.New("no retry CLI codename for node and no default")
+
+const defaultRetryCount = 3
+
+// EffectiveRetryLimit returns the maximum retry count for the node (conventional default 3 when node.Retries <= 0).
+func EffectiveRetryLimit(node *types.ProcessedNode) int {
+	if node == nil || node.Retries <= 0 {
+		return defaultRetryCount
+	}
+	return node.Retries
+}
+
+// BuildRetryPrompt returns a retry prompt: the original prompt, prior validation critiques (one section per attempt),
+// and the appropriate response-type instruction (process or decision). Used when validation fails and the node is retried.
+func BuildRetryPrompt(node *types.ProcessedNode, priorCritiques []string) string {
+	if node == nil {
+		return ""
+	}
+	base := strings.TrimSpace(node.Prompt)
+	for _, c := range priorCritiques {
+		if strings.TrimSpace(c) == "" {
+			continue
+		}
+		base += "\n\n---\nPrevious validation feedback:\n"
+		base += strings.TrimSpace(c)
+	}
+	instruction := ProcessResponseInstructionForKind(ResponseKind(node))
+	if instruction == "" {
+		return base
+	}
+	return base + "\n\n" + instruction
+}
+
+// FormatValidationCritique turns a failed ValidationResponse into a single critique string for the retry prompt.
+func FormatValidationCritique(v types.ValidationResponse) string {
+	var b strings.Builder
+	if len(v.Warnings) > 0 {
+		b.WriteString(strings.Join(v.Warnings, "\n"))
+		b.WriteString("\n")
+	}
+	b.WriteString("Validation did not pass (fully_completed: false).")
+	return b.String()
+}
+
+// VerifyRunOutput parses the CLI stdout as ProcessResponse or DecisionResponse based on node kind and returns an error if parsing fails.
+func VerifyRunOutput(node *types.ProcessedNode, stdout string) error {
+	if node == nil {
+		return errors.New("cannot verify run output: nil node")
+	}
+	kind := ResponseKind(node)
+	switch kind {
+	case ResponseKindDecision:
+		_, err := types.ParseDecisionResponse(stdout)
+		return err
+	case ResponseKindProcess:
+		_, err := types.ParseProcessResponse(stdout)
+		return err
+	default:
+		_, err := types.ParseProcessResponse(stdout)
+		return err
+	}
+}
 
 // BuildValidatePrompt returns the full validation prompt: the node's validation prompt text (default or custom),
 // context (original prompt and output to validate), and the validation response type instruction.
@@ -195,7 +294,7 @@ func RunValidation(node *types.ProcessedNode, opts RunOptions, nodeOutput string
 	}
 	command := BuildCommand(cli, fullPrompt)
 	shell, shellArgs := runner.DefaultShell()
-	res, err := runner.RunShellCommand(runner.CommandSpec{
+	res, err := runShell(runner.CommandSpec{
 		Shell:     shell,
 		ShellArgs: shellArgs,
 		Command:   command,
@@ -225,8 +324,8 @@ type NodeResult struct {
 
 // RunNodeThenValidate runs the node, then automatically runs validation when ShouldValidate(node) is true.
 // On success (node run succeeds and, if validation ran, validation passed), Valid is true and the caller can run the next node.
-// On failure, Valid is false and ValidationError may be set; retries are not implemented yet.
-// Returns a non-nil error only for run or validation CLI/shell/parse failures; when validation ran and fully_completed is false, error is nil and Valid is false.
+// On validation failure, retries run with a custom retry prompt (original + prior validation critiques + response type) until validation passes or EffectiveRetryLimit is reached.
+// Returns a non-nil error only for run or validation CLI/shell/parse failures; when validation ran and fully_completed is false and retries exhausted, error is nil and Valid is false.
 func RunNodeThenValidate(node *types.ProcessedNode, opts RunOptions) (NodeResult, error) {
 	var out NodeResult
 	runRes, err := RunNode(node, opts)
@@ -249,6 +348,63 @@ func RunNodeThenValidate(node *types.ProcessedNode, opts RunOptions) (NodeResult
 	out.Valid = valRes.Valid
 	if !out.Valid {
 		out.ValidationError = errors.New("validation did not pass: fully_completed is false")
+		runOut, retryErr := runRetryLoop(node, opts, &out, []string{FormatValidationCritique(valRes.Response)})
+		if retryErr != nil {
+			return runOut, retryErr
+		}
+		return runOut, nil
 	}
 	return out, nil
+}
+
+// RunRetry runs the node with a custom retry prompt using the retry CLI. Caller must verify response type and run validation.
+func RunRetry(node *types.ProcessedNode, opts RunOptions, retryPrompt string) (runner.Result, error) {
+	cli, err := ResolveRetryCLI(node, opts.DefaultRetryCLI)
+	if err != nil {
+		return runner.Result{}, err
+	}
+	command := BuildCommand(cli, retryPrompt)
+	shell, shellArgs := runner.DefaultShell()
+	return runShell(runner.CommandSpec{
+		Shell:     shell,
+		ShellArgs: shellArgs,
+		Command:   command,
+		WorkDir:   opts.WorkDir,
+	})
+}
+
+// runRetryLoop runs retries until validation passes or EffectiveRetryLimit is reached. Mutates node.Retried and out.
+func runRetryLoop(node *types.ProcessedNode, opts RunOptions, out *NodeResult, critiques []string) (NodeResult, error) {
+	limit := EffectiveRetryLimit(node)
+	for node.Retried < limit {
+		node.Retried++
+		retryPrompt := BuildRetryPrompt(node, critiques)
+		if retryPrompt == "" {
+			return *out, errors.New("retry prompt is empty")
+		}
+		runRes, err := RunRetry(node, opts, retryPrompt)
+		if err != nil {
+			out.ValidationError = err
+			return *out, err
+		}
+		if err := VerifyRunOutput(node, runRes.Stdout); err != nil {
+			out.ValidationError = err
+			return *out, err
+		}
+		valRes, err := RunValidation(node, opts, runRes.Stdout)
+		if err != nil {
+			out.ValidationError = err
+			return *out, err
+		}
+		out.RunResult = runRes
+		out.Validation = &valRes
+		if valRes.Valid {
+			out.Valid = true
+			out.ValidationError = nil
+			return *out, nil
+		}
+		critiques = append(critiques, FormatValidationCritique(valRes.Response))
+	}
+	out.ValidationError = errors.New("validation did not pass: max retries reached")
+	return *out, nil
 }
