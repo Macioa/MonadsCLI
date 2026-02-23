@@ -39,6 +39,7 @@ type ProcessedNodeDefaults struct {
 // All instruction fields are set by internal→processed conversion; the runner
 // uses them as-is (defaults applied only when a field is empty).
 type ProcessedNode struct {
+	Name           string `json:"name,omitempty"`   // Shape label from source (e.g. Process, Decision).
 	Prompt         string `json:"prompt,omitempty"`
 	RetryPrompt    string `json:"retry_prompt,omitempty"`
 	ValidatePrompt string `json:"validate_prompt,omitempty"`
@@ -92,6 +93,7 @@ func nodeToProcessedNodeWith(n *Node, defaultValidate string, codenames map[stri
 	}
 	res := resolveNodeValues(n, defaultValidate, codenames, defaults)
 	out := &ProcessedNode{
+		Name:           strings.TrimSpace(n.Label),
 		Prompt:         strings.TrimSpace(n.Text),
 		ValidatePrompt: res.ValidatePrompt,
 		CLI:            res.CLI,

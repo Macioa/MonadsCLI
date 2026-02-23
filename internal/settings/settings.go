@@ -27,11 +27,14 @@ const (
 
 // Default values for behavior settings (must match readme/settings.md).
 var defaultValues = map[string]string{
-	"DEFAULT_CLI":         "CURSOR",
-	"DEFAULT_TIMEOUT":     "600",
-	"DEFAULT_RETRY_CLI":   "CURSOR",
-	"DEFAULT_RETRY_COUNT": "3",
+	"DEFAULT_CLI":          "CURSOR",
+	"DEFAULT_TIMEOUT":      "600",
+	"DEFAULT_RETRY_CLI":    "CURSOR",
+	"DEFAULT_RETRY_COUNT":  "3",
 	"DEFAULT_VALIDATE_CLI": "CURSOR",
+	"LOG_DIR":              "./_monad_logs/",
+	"WRITE_LOG_SHORT":      "true",
+	"WRITE_LOG_LONG":       "true",
 }
 
 // Settings defines a map of env keys to values.
@@ -411,6 +414,9 @@ var extraSettingsKeys = []string{
 	"DEFAULT_RETRY_CLI",
 	"DEFAULT_RETRY_COUNT",
 	"DEFAULT_VALIDATE_CLI",
+	"LOG_DIR",
+	"WRITE_LOG_SHORT",
+	"WRITE_LOG_LONG",
 	"LUCIDCHART_API_KEY",
 	"LUCID_OAUTH_CLIENT_ID",
 	"LUCID_OAUTH_CLIENT_SECRET",

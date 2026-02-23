@@ -10,17 +10,21 @@ on:
 
 jobs:
   docker-tests:
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: [ubuntu, debian, alpine, fedora, ubuntu-pwsh]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Run docker tests
+      - name: Build and run docker tests
         run: |
           chmod +x test/docker/run-all.sh
-          ./test/docker/run-all.sh
+          ./test/docker/run-all.sh "${{ matrix.distro }}"
 
-      - name: Run Go tests in installed images
+      - name: Run Go tests in installed image
         run: |
           chmod +x test/docker/run-tests.sh
-          ./test/docker/run-tests.sh
+          ./test/docker/run-tests.sh "${{ matrix.distro }}"

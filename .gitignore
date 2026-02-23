@@ -30,6 +30,9 @@ go.work.sum
 # Generated reports
 reports/
 
+# Run logs (LOG_DIR)
+_monad_logs/
+
 # Editor/IDE
 # .idea/
 # .vscode/

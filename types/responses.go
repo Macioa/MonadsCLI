@@ -28,17 +28,28 @@ type ValidationResponse struct {
 	Warnings          []string `json:"warnings"`
 }
 
-// parseJSONFromStdout unmarshals trimmed stdout into v; if that fails, tries the last
-// JSON object in the output (e.g. when the CLI echoes other text). Composable helper for response parsers.
+// parseJSONFromStdout unmarshals trimmed stdout into v; if that fails, strips markdown
+// code fences (```json ... ```) and tries again, then tries from last "{" to end.
 func parseJSONFromStdout(trimmed string, v interface{}) error {
-	if err := json.Unmarshal([]byte(trimmed), v); err == nil {
+	try := trimmed
+	for _, prefix := range []string{"```json\n", "```json\r\n", "```\n", "```\r\n"} {
+		if strings.HasPrefix(try, prefix) {
+			try = try[len(prefix):]
+			break
+		}
+	}
+	if strings.HasSuffix(try, "```") {
+		try = strings.TrimSuffix(try, "```")
+		try = strings.TrimSpace(try)
+	}
+	if err := json.Unmarshal([]byte(try), v); err == nil {
 		return nil
 	}
-	start := strings.LastIndex(trimmed, "{")
+	start := strings.LastIndex(try, "{")
 	if start < 0 {
-		return json.Unmarshal([]byte(trimmed), v)
+		return json.Unmarshal([]byte(try), v)
 	}
-	return json.Unmarshal([]byte(trimmed[start:]), v)
+	return json.Unmarshal([]byte(try[start:]), v)
 }
 
 // ParseProcessResponse extracts and parses a ProcessResponse from CLI stdout.

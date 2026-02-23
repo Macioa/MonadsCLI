@@ -24,6 +24,7 @@ func main() {
 		loginCommand(),
 		lucidCommand(),
 		runCommand(),
+		runTreeCommand(),
 		settingsCommand(),
 	})
 }

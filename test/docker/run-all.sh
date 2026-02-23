@@ -27,8 +27,23 @@ build_and_install() {
   docker image prune -f
 }
 
-build_and_install ubuntu "$ROOT_DIR/test/docker/Dockerfile.ubuntu"
-build_and_install debian "$ROOT_DIR/test/docker/Dockerfile.debian"
-build_and_install alpine "$ROOT_DIR/test/docker/Dockerfile.alpine"
-build_and_install fedora "$ROOT_DIR/test/docker/Dockerfile.fedora"
-build_and_install ubuntu-pwsh "$ROOT_DIR/test/docker/Dockerfile.ubuntu-pwsh" "linux/amd64"
+run_one() {
+  case "$1" in
+    ubuntu)       build_and_install ubuntu "$ROOT_DIR/test/docker/Dockerfile.ubuntu" ;;
+    debian)       build_and_install debian "$ROOT_DIR/test/docker/Dockerfile.debian" ;;
+    alpine)       build_and_install alpine "$ROOT_DIR/test/docker/Dockerfile.alpine" ;;
+    fedora)       build_and_install fedora "$ROOT_DIR/test/docker/Dockerfile.fedora" ;;
+    ubuntu-pwsh)  build_and_install ubuntu-pwsh "$ROOT_DIR/test/docker/Dockerfile.ubuntu-pwsh" "linux/amd64" ;;
+    *) echo "Unknown distro: $1" >&2; exit 1 ;;
+  esac
+}
+
+if [[ -n "${1:-}" ]]; then
+  run_one "$1"
+else
+  run_one ubuntu
+  run_one debian
+  run_one alpine
+  run_one fedora
+  run_one ubuntu-pwsh
+fi

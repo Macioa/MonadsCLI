@@ -26,6 +26,9 @@ Use these **codename** values for `DEFAULT_CLI`, `DEFAULT_RETRY_CLI`, and `DEFAU
 | DEFAULT_RETRY_CLI | Codename of CLI to use for retries | CURSOR |
 | DEFAULT_RETRY_COUNT | Maximum number of retries | 3 |
 | DEFAULT_VALIDATE_CLI | Codename of CLI to use for validation | CURSOR |
+| LOG_DIR | Relative path for run logs (from CLI cwd) | ./_monad_logs/ |
+| WRITE_LOG_SHORT | Write short log (response JSONs per node + validations/retries) | true |
+| WRITE_LOG_LONG | Write long log (full LLM output per run) | true |
 
 ### Agentic CLI API keys
 

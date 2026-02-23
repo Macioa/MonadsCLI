@@ -37,6 +37,22 @@ func TestParseValidationResponse(t *testing.T) {
 			t.Errorf("Warnings = %v, want [x]", v.Warnings)
 		}
 	})
+	t.Run("markdown_code_fence", func(t *testing.T) {
+		stdout := "```json\n{\"fully_completed\": false, \"partially_completed\": true, \"should_retry\": true, \"warnings\": [\"a\"]}\n```"
+		v, err := ParseValidationResponse(stdout)
+		if err != nil {
+			t.Fatal(err)
+		}
+		if v.FullyCompleted {
+			t.Error("FullyCompleted want false")
+		}
+		if !v.PartiallyCompleted || !v.ShouldRetry {
+			t.Error("PartiallyCompleted and ShouldRetry want true")
+		}
+		if len(v.Warnings) != 1 || v.Warnings[0] != "a" {
+			t.Errorf("Warnings = %v, want [a]", v.Warnings)
+		}
+	})
 	t.Run("invalid_json", func(t *testing.T) {
 		_, err := ParseValidationResponse("not json at all")
 		if err == nil {

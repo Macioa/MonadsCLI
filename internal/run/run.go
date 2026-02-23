@@ -2,6 +2,7 @@ package run
 
 import (
 	"errors"
+	"io"
 	"strings"
 
 	"github.com/ryanmontgomery/MonadsCLI/internal/runner"
@@ -99,6 +100,8 @@ type RunOptions struct {
 	DefaultValidateCLI string // Codename when node.ValidateCLI is empty (e.g. from settings DEFAULT_VALIDATE_CLI).
 	DefaultRetryCLI    string // Codename when node.RetryCLI is empty (e.g. from settings DEFAULT_RETRY_CLI).
 	WorkDir            string // Working directory for the shell command; empty means current dir.
+	// LogLongWriter, when set, receives each LLM stdout (run, validate, retry) for long log.
+	LogLongWriter io.Writer
 }
 
 // shellRunner is set by tests to fake shell execution; when nil, the real runner is used.
@@ -116,6 +119,17 @@ func runShell(spec runner.CommandSpec) (runner.Result, error) {
 	return runner.RunShellCommand(spec)
 }
 
+func appendLongLog(w io.Writer, stdout string) {
+	if w == nil || stdout == "" {
+		return
+	}
+	_, _ = io.WriteString(w, stdout)
+	if len(stdout) > 0 && stdout[len(stdout)-1] != '\n' {
+		_, _ = io.WriteString(w, "\n")
+	}
+	_, _ = io.WriteString(w, "\n---\n")
+}
+
 // RunNode runs the processed node: resolves CLI, builds prompt with response type, invokes CLI, returns result.
 // It does not verify the response type or retry.
 func RunNode(node *types.ProcessedNode, opts RunOptions) (runner.Result, error) {
@@ -126,12 +140,16 @@ func RunNode(node *types.ProcessedNode, opts RunOptions) (runner.Result, error) 
 	fullPrompt := BuildRunPrompt(node)
 	command := BuildCommand(cli, fullPrompt)
 	shell, shellArgs := runner.DefaultShell()
-	return runShell(runner.CommandSpec{
+	res, err := runShell(runner.CommandSpec{
 		Shell:     shell,
 		ShellArgs: shellArgs,
 		Command:   command,
 		WorkDir:   opts.WorkDir,
 	})
+	if err == nil {
+		appendLongLog(opts.LogLongWriter, res.Stdout)
+	}
+	return res, err
 }
 
 // ShouldValidate reports whether the node should be validated after it runs.
@@ -301,6 +319,9 @@ func RunValidation(node *types.ProcessedNode, opts RunOptions, nodeOutput string
 		WorkDir:   opts.WorkDir,
 	})
 	out.RunnerResult = res
+	if err == nil {
+		appendLongLog(opts.LogLongWriter, res.Stdout)
+	}
 	if err != nil {
 		return out, err
 	}
@@ -365,12 +386,16 @@ func RunRetry(node *types.ProcessedNode, opts RunOptions, retryPrompt string) (r
 	}
 	command := BuildCommand(cli, retryPrompt)
 	shell, shellArgs := runner.DefaultShell()
-	return runShell(runner.CommandSpec{
+	res, err := runShell(runner.CommandSpec{
 		Shell:     shell,
 		ShellArgs: shellArgs,
 		Command:   command,
 		WorkDir:   opts.WorkDir,
 	})
+	if err == nil {
+		appendLongLog(opts.LogLongWriter, res.Stdout)
+	}
+	return res, err
 }
 
 // runRetryLoop runs retries until validation passes or EffectiveRetryLimit is reached. Mutates node.Retried and out.

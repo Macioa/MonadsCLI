@@ -29,8 +29,8 @@ func TestFromJSONAndGet(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Get: %v", err)
 	}
-	// Get() merges default values; output includes DEFAULT_* when not set
-	expectedOut := "CURSOR_API_KEY=def\nDEFAULT_CLI=CURSOR\nDEFAULT_RETRY_CLI=CURSOR\nDEFAULT_RETRY_COUNT=3\nDEFAULT_TIMEOUT=600\nDEFAULT_VALIDATE_CLI=CURSOR\nGEMINI_API_KEY=abc"
+	// Get() merges default values; output includes DEFAULT_* and LOG_* when not set
+	expectedOut := "CURSOR_API_KEY=def\nDEFAULT_CLI=CURSOR\nDEFAULT_RETRY_CLI=CURSOR\nDEFAULT_RETRY_COUNT=3\nDEFAULT_TIMEOUT=600\nDEFAULT_VALIDATE_CLI=CURSOR\nGEMINI_API_KEY=abc\nLOG_DIR=./_monad_logs/\nWRITE_LOG_LONG=true\nWRITE_LOG_SHORT=true"
 	if string(payload) != expectedOut {
 		t.Fatalf("Get output mismatch: %q", string(payload))
 	}
@@ -139,7 +139,7 @@ SHOULD_SKIP=skip
 	}
 
 	// ToFile() merges default values
-	expectedOut := "CURSOR_API_KEY=def\nDEFAULT_CLI=CURSOR\nDEFAULT_RETRY_CLI=CURSOR\nDEFAULT_RETRY_COUNT=3\nDEFAULT_TIMEOUT=600\nDEFAULT_VALIDATE_CLI=CURSOR\nGEMINI_API_KEY=\"abc 123\""
+	expectedOut := "CURSOR_API_KEY=def\nDEFAULT_CLI=CURSOR\nDEFAULT_RETRY_CLI=CURSOR\nDEFAULT_RETRY_COUNT=3\nDEFAULT_TIMEOUT=600\nDEFAULT_VALIDATE_CLI=CURSOR\nGEMINI_API_KEY=\"abc 123\"\nLOG_DIR=./_monad_logs/\nWRITE_LOG_LONG=true\nWRITE_LOG_SHORT=true"
 	if string(output) != expectedOut {
 		t.Fatalf("output mismatch: %q", string(output))
 	}
