@@ -40,5 +40,5 @@ _monad_logs/
 # macOS
 .DS_Store
 
-# Local binary
-monadscli
+# Local binary (root only; do not ignore cmd/monadscli/*.go)
+/monadscli
