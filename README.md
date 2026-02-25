@@ -1,4 +1,5 @@
 # MonadsCLI
+### (Pre-Alpha)
 
 <p align="center"><strong>Run Lucidchart decision trees with agentic CLI's.</strong></p>
 
@@ -8,7 +9,7 @@
 
 <p align="center">Easy prompt running for local or cloud agentic workflows.</p>
 
-<p align="center">Reusable logic flows — design once in Lucidchart, run anywhere.</p>
+<p align="center">Reusable easy-to-read logic flows.</p>
 
 <p align="center">Dockerizable, works with <a href="https://docs.github.com/en/actions">GitHub Actions</a>.</p>
 
