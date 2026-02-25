@@ -35,3 +35,13 @@
 <p align="center"><img src="../images/decision.png" alt="Decision node" /></p>
 
 <p align="center"><strong>Predefined process</strong> – A predefined process runs the same as a regular process but can be used to distinguish prompts that use traditional deterministic tooling like scripts or MCPs.</p>
+
+---
+
+## Docs
+
+- [Quick](quick.md)
+- [Install](install.md)
+- [Creating a Lucidchart decision tree](create-tree.md)
+- [Metadata in trees](metadata.md)
+- [Settings and keys](settings.md)

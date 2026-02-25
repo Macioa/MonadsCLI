@@ -90,3 +90,13 @@ Write settings to a `.env` file:
 ```bash
 monadscli settings to-file --path ./out.env
 ```
+
+---
+
+## Docs
+
+- [Quick](quick.md)
+- [Install](install.md)
+- [Creating a Lucidchart decision tree](create-tree.md)
+- [Metadata in trees](metadata.md)
+- [Settings and keys](settings.md)

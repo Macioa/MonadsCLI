@@ -164,3 +164,13 @@ Defined in `types/responses.go`; parsed via `ParseProcessResponse`, `ParseDecisi
 
 - **Tags and metadata:** `readme/metadata.md` (NoValidation, CLI codename, validate_prompt, validate_cli, retry_cli, retries, timeout).
 - **Settings and defaults:** `readme/settings.md` (DEFAULT_CLI, DEFAULT_VALIDATE_CLI, DEFAULT_RETRY_CLI, DEFAULT_RETRY_COUNT, LOG_DIR, etc.).
+
+---
+
+## Docs
+
+- [Quick](quick.md)
+- [Install](install.md)
+- [Creating a Lucidchart decision tree](create-tree.md)
+- [Metadata in trees](metadata.md)
+- [Settings and keys](settings.md)

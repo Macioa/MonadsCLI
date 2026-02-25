@@ -1,54 +1,29 @@
 # MonadsCLI
 
-Minimal Go CLI scaffold with subcommands, shell execution, and report output.
+<p align="center"><strong>Run Lucidchart decision trees with agentic CLI's.</strong></p>
 
-## Install
+<p align="center"><img src="images/tree.png" alt="Decision tree" /></p>
 
-Install asdf:
+---
 
-```bash
-git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.14.0
-```
+<p align="center">Easy prompt running for local or cloud agentic workflows.</p>
 
-Add to shell (bash/zsh):
+<p align="center">Reusable logic flows — design once in Lucidchart, run anywhere.</p>
 
-```bash
-. "$HOME/.asdf/asdf.sh"
-```
+<p align="center">Dockerizable, works with <a href="https://docs.github.com/en/actions">GitHub Actions</a>.</p>
 
-Install Go via asdf:
+<p align="center">Built-in and customizable <a href="readme/settings.md">validation and retries</a>.</p>
 
-```bash
-asdf plugin add golang
-asdf install golang 1.20.0
-asdf global golang 1.20.0
-```
+<p align="center">Specify <a href="readme/metadata.md">agents for specific tasks</a> with cross-agent validation.</p>
 
-## Usage
+<p align="center">Built-in support for: <strong>Agent CLI (Cursor)</strong>, <strong>Claude CLI</strong>, <strong>Gemini CLI</strong>, <strong>Qodo CLI</strong>.</p>
 
-```bash
-go run ./cmd/monadscli run --command "echo hello"
-```
+---
 
-## Build and Run
+## Docs
 
-Build a binary:
-
-```bash
-go build -o bin/monadscli ./cmd/monadscli
-```
-
-Run the binary:
-
-```bash
-./bin/monadscli run --command "echo hello"
-```
-
-### Examples
-
-```bash
-go run ./cmd/monadscli run --command "ls -la" --report ./reports/ls.json
-go run ./cmd/monadscli run --command "Get-Process" --shell powershell --shell-arg -Command
-```
-
-Reports are written as JSON and include stdout/stderr, timing, and exit code.
+- [Quick](readme/quick.md)
+- [Install](readme/install.md)
+- [Creating a Lucidchart decision tree](readme/create-tree.md)
+- [Metadata in trees](readme/metadata.md)
+- [Settings and keys](readme/settings.md)

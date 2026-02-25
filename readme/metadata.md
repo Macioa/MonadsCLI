@@ -54,3 +54,13 @@
 | **retries** | Maximum retries when validation fails | `3`, `5` |
 | **timeout** | Timeout in seconds for CLI operations (0 = use runner default) | `600`, `300` |
 | **validate_prompt** | Custom validation prompt text; ignored if node has **NoValidation** tag | `Did the model follow the instructions exactly?` |
+
+---
+
+## Docs
+
+- [Quick](quick.md)
+- [Install](install.md)
+- [Creating a Lucidchart decision tree](create-tree.md)
+- [Metadata in trees](metadata.md)
+- [Settings and keys](settings.md)
