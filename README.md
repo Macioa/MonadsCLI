@@ -1,7 +1,7 @@
 # MonadsCLI
 ### (Pre-Alpha)
 
-<p align="center"><strong>Run Lucidchart decision trees with agentic CLI's.</strong></p>
+<p align="center"><strong>Run <a href="https://www.lucidchart.com/pages/landing/flowchart-software">Lucidchart</a> decision trees with agentic CLI's.</strong></p>
 
 <p align="center"><img src="images/tree.png" alt="Decision tree" /></p>
 
@@ -17,7 +17,7 @@
 
 <p align="center">Specify <a href="readme/metadata.md">agents for specific tasks</a> with cross-agent validation.</p>
 
-<p align="center">Built-in support for: <strong>Agent CLI (Cursor)</strong>, <strong>Claude CLI</strong>, <strong>Gemini CLI</strong>, <strong>Qodo CLI</strong>.</p>
+<p align="center">Built-in support for: <strong><a href="https://cursor.com">Agent CLI (Cursor)</a></strong>, <strong><a href="https://docs.anthropic.com/en/docs/build-with-claude/claude-cli">Claude CLI</a></strong>, <strong><a href="https://ai.google.dev/gemini-api">Gemini CLI</a></strong>, <strong><a href="https://qodo.ai">Qodo CLI</a></strong>.</p>
 
 ---
 
