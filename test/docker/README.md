@@ -1,3 +1,5 @@
+<div style="background-color: white;">
+
 ## Docker test matrix
 
 This folder contains Linux distro Dockerfiles that build and run `monadscli`.
@@ -29,3 +31,5 @@ docker build -f test/docker/Dockerfile.debian \
   --build-arg GO_VERSION=1.24.0 \
   -t monadscli-test:debian .
 ```
+
+</div>

@@ -1,3 +1,5 @@
+<div style="background-color: white;">
+
 # Quick start
 
 **1. Install**
@@ -35,3 +37,5 @@ monadscli lucid document --id <document-id>
 - [Creating a Lucidchart decision tree](create-tree.md)
 - [Metadata in trees](metadata.md)
 - [Settings and keys](settings.md)
+
+</div>

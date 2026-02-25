@@ -1,3 +1,5 @@
+<div style="background-color: white;">
+
 # Install
 
 <p align="center">Install the CLI with Go.</p>
@@ -37,3 +39,5 @@ Configure your agent and API keys after install. For supported CLIs, key names, 
 - [Creating a Lucidchart decision tree](create-tree.md)
 - [Metadata in trees](metadata.md)
 - [Settings and keys](settings.md)
+
+</div>

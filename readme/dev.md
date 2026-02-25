@@ -1,3 +1,5 @@
+<div style="background-color: white;">
+
 # MonadsCLI
 
 Minimal Go CLI scaffold with subcommands, shell execution, and report output.
@@ -62,3 +64,5 @@ Reports are written as JSON and include stdout/stderr, timing, and exit code.
 - [Creating a Lucidchart decision tree](create-tree.md)
 - [Metadata in trees](metadata.md)
 - [Settings and keys](settings.md)
+
+</div>

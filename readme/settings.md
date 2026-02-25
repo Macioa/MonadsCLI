@@ -1,3 +1,5 @@
+<div style="background-color: white;">
+
 # Settings CLI
 
 Manage settings with the `settings` subcommand.
@@ -100,3 +102,5 @@ monadscli settings to-file --path ./out.env
 - [Creating a Lucidchart decision tree](create-tree.md)
 - [Metadata in trees](metadata.md)
 - [Settings and keys](settings.md)
+
+</div>

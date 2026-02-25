@@ -1,3 +1,5 @@
+<div style="background-color: white;">
+
 # MonadsCLI
 ### (Pre-Alpha)
 
@@ -9,7 +11,7 @@
 
 <p align="center">Easy prompt running for local or cloud agentic workflows.</p>
 
-<p align="center">Reusable easy-to-read logic flows.</p>
+<p align="center">Reusable easy-to-read logic flows. Save to file or cloud. Run from local or cloud.</p>
 
 <p align="center">Dockerizable, works with <a href="https://docs.github.com/en/actions">GitHub Actions</a>.</p>
 
@@ -28,3 +30,5 @@
 - [Creating a Lucidchart decision tree](readme/create-tree.md)
 - [Metadata in trees](readme/metadata.md)
 - [Settings and keys](readme/settings.md)
+
+</div>

@@ -1,3 +1,5 @@
+<div style="background-color: white;">
+
 # Decision tree process
 
 This document describes the technical pipeline for running a decision tree: import, run, validate, and retry. It is intended for maintainers and integrators.
@@ -174,3 +176,5 @@ Defined in `types/responses.go`; parsed via `ParseProcessResponse`, `ParseDecisi
 - [Creating a Lucidchart decision tree](create-tree.md)
 - [Metadata in trees](metadata.md)
 - [Settings and keys](settings.md)
+
+</div>

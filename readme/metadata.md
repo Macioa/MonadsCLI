@@ -1,3 +1,5 @@
+<div style="background-color: white;">
+
 # Node Tags and Metadata Variables
 
 **Tags** and **metadata variables** can be applied to provide custom behvavior to nodes in the decision tree in Lucidchart. The chart stores this configuration, so overrides for options like CLI, validation, retries, and timeouts live directly in the tree.
@@ -64,3 +66,5 @@
 - [Creating a Lucidchart decision tree](create-tree.md)
 - [Metadata in trees](metadata.md)
 - [Settings and keys](settings.md)
+
+</div>

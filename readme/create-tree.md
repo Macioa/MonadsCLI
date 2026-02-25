@@ -1,3 +1,5 @@
+<div style="background-color: white;">
+
 # Creating a Lucidchart Decision Tree
 
 <p align="center"><strong>1. Open Lucidchart</strong> (<a href="https://lucid.app/documents">lucid.app/documents</a>) and create a new flowchart (empty doc).</p>
@@ -45,3 +47,5 @@
 - [Creating a Lucidchart decision tree](create-tree.md)
 - [Metadata in trees](metadata.md)
 - [Settings and keys](settings.md)
+
+</div>
