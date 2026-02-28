@@ -12,6 +12,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -20,9 +21,9 @@ import (
 )
 
 const (
-	settingsFileName = "monadscli.settings.enc"
-	settingsKeyName  = "monadscli.settings.key"
-	settingsKeyEnv   = "MONADSCLI_SETTINGS_KEY"
+	stateFileName  = "state"
+	keyFileName    = "k"
+	settingsKeyEnv = "MONADSCLI_SETTINGS_KEY"
 )
 
 // Default values for behavior settings (must match readme/settings.md).
@@ -237,39 +238,54 @@ func writeEncrypted(payload []byte) error {
 }
 
 func settingsPath() (string, error) {
-	dir, err := settingsDir()
+	dir, err := stateDir()
 	if err != nil {
 		return "", err
 	}
-
-	return filepath.Join(dir, settingsFileName), nil
+	return filepath.Join(dir, stateFileName), nil
 }
 
 func settingsKeyPath() (string, error) {
-	dir, err := settingsDir()
+	dir, err := keyDir()
 	if err != nil {
 		return "", err
 	}
-
-	return filepath.Join(dir, settingsKeyName), nil
+	return filepath.Join(dir, keyFileName), nil
 }
 
-func settingsDir() (string, error) {
-	home, homeErr := os.UserHomeDir()
-	if homeErr != nil {
-		return "", homeErr
+// stateDir returns the OS-appropriate directory for the encrypted state file.
+// Prefer config dir so it's included in normal backups; key lives in a different dir (keyDir).
+func stateDir() (string, error) {
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		return "", err
 	}
+	return filepath.Join(dir, "MonadsCLI"), nil
+}
 
-	exe, err := os.Executable()
-	if err == nil && exe != "" {
-		dir := filepath.Dir(exe)
-		// Use stable home dir when running via "go run" (temp path varies per run)
-		if !strings.Contains(dir, "go-build") {
-			return dir, nil
+// keyDir returns a different OS-appropriate directory for the key file,
+// so state and key are not in the same place.
+func keyDir() (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+	switch runtime.GOOS {
+	case "darwin":
+		return filepath.Join(home, ".MonadsCLI"), nil
+	case "windows":
+		localAppData := os.Getenv("LOCALAPPDATA")
+		if localAppData == "" {
+			localAppData = filepath.Join(home, "AppData", "Local")
 		}
+		return filepath.Join(localAppData, "MonadsCLI"), nil
+	default:
+		dataHome := os.Getenv("XDG_DATA_HOME")
+		if dataHome == "" {
+			dataHome = filepath.Join(home, ".local", "share")
+		}
+		return filepath.Join(dataHome, "MonadsCLI"), nil
 	}
-
-	return filepath.Join(home, ".config", "monadscli"), nil
 }
 
 func encrypt(plain []byte) ([]byte, error) {
@@ -345,7 +361,7 @@ func settingsKey() ([]byte, error) {
 		return nil, err
 	}
 
-	if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return nil, err
 	}
 
