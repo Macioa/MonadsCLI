@@ -132,7 +132,7 @@ func ExecuteTree(root *types.ProcessedNode, opts run.RunOptions, workDir, logDir
 			if parseErr != nil {
 				return res, parseErr
 			}
-			child := node.Children[d.Answer]
+			child := resolveChild(node.Children, d.Answer)
 			if child != nil {
 				_, err = runNode(child)
 				return res, err
@@ -145,4 +145,23 @@ func ExecuteTree(root *types.ProcessedNode, opts run.RunOptions, workDir, logDir
 		return err
 	}
 	return logger.Write(workDir)
+}
+
+// resolveChild picks the next node by answer: exact key, else single child, else case-insensitive match.
+func resolveChild(children map[string]*types.ProcessedNode, answer string) *types.ProcessedNode {
+	if c := children[answer]; c != nil {
+		return c
+	}
+	if len(children) == 1 {
+		for _, c := range children {
+			return c
+		}
+	}
+	answerLower := strings.ToLower(strings.TrimSpace(answer))
+	for k, c := range children {
+		if strings.ToLower(strings.TrimSpace(k)) == answerLower {
+			return c
+		}
+	}
+	return nil
 }
