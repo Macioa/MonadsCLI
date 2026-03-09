@@ -19,7 +19,7 @@
 
 <p align="center">Specify <a href="readme/metadata.md">agents for specific tasks</a> with cross-agent validation.</p>
 
-<p align="center">Built-in support for: <strong><a href="https://cursor.com">Agent CLI (Cursor)</a></strong>, <strong><a href="https://docs.anthropic.com/en/docs/build-with-claude/claude-cli">Claude CLI</a></strong>, <strong><a href="https://ai.google.dev/gemini-api">Gemini CLI</a></strong>, <strong><a href="https://qodo.ai">Qodo CLI</a></strong>.</p>
+<p align="center">Built-in support for: <strong><a href="https://cursor.com">Agent CLI (Cursor)</a></strong>, <strong><a href="https://docs.anthropic.com/en/docs/build-with-claude/claude-cli">Claude CLI</a></strong>, <strong><a href="https://ai.google.dev/gemini-api">Gemini CLI</a></strong>, <strong><a href="https://github.com/github/copilot-cli">GitHub Copilot CLI</a></strong>, <strong><a href="https://qodo.ai">Qodo CLI</a></strong>.</p>
 
 ---
 

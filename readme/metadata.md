@@ -41,7 +41,7 @@
 | Tag | Effect |
 |-----|--------|
 | **NoValidation** | Validation is skipped for this node. Use for steps that don’t need a check. Accepts NoValidation, novalidation, no_validation, noValidation. |
-| **&lt;CLI codename&gt;** | Use that CLI to run this node instead of the default. Any tag matching a known CLI codename (`GEMINI`, `CURSOR`, `CLAUDE`, `COPILOT`, `AIDER`, `QODO`) sets the node’s CLI. Case-insensitive (e.g. gemini, GEMINI) |
+| **&lt;CLI codename&gt;** | Use that CLI to run this node instead of the default. Any tag matching a known CLI codename (`GEMINI`, `CURSOR`, `CLAUDE`, `COPILOT`, `QODO`) sets the node’s CLI. Case-insensitive (e.g. gemini, GEMINI) |
 
 
 
@@ -51,8 +51,8 @@
 
 | Variable | Effect | Example value |
 |----------|--------|---------------|
-| **validate_cli** | Which CLI validates this node’s response | `GEMINI`, `CURSOR`, `CLAUDE`, `COPILOT`, `AIDER`, `QODO` |
-| **retry_cli** | Which CLI retries after validation failure | `GEMINI`, `CURSOR`, `CLAUDE`, `COPILOT`, `AIDER`, `QODO` |
+| **validate_cli** | Which CLI validates this node’s response | `GEMINI`, `CURSOR`, `CLAUDE`, `COPILOT`, `QODO` |
+| **retry_cli** | Which CLI retries after validation failure | `GEMINI`, `CURSOR`, `CLAUDE`, `COPILOT`, `QODO` |
 | **retries** | Maximum retries when validation fails | `3`, `5` |
 | **timeout** | Timeout in seconds for CLI operations (0 = use runner default) | `600`, `300` |
 | **validate_prompt** | Custom validation prompt text; ignored if node has **NoValidation** tag | `Did the model follow the instructions exactly?` |

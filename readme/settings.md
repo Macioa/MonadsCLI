@@ -14,7 +14,6 @@ Use these **codename** values for `DEFAULT_CLI`, `DEFAULT_RETRY_CLI`, and `DEFAU
 | CURSOR   | Cursor CLI     | CURSOR_API_KEY                         |
 | CLAUDE   | Claude CLI     | ANTHROPIC_API_KEY                      |
 | COPILOT  | GitHub Copilot CLI | GH_TOKEN                           |
-| AIDER    | Aider          | OPENAI_API_KEY, ANTHROPIC_API_KEY      |
 | QODO     | Qodo Gen CLI   | QODO_API_KEY                           |
 
 ## Available settings
@@ -38,7 +37,6 @@ Use these **codename** values for `DEFAULT_CLI`, `DEFAULT_RETRY_CLI`, and `DEFAU
 - CURSOR_API_KEY — [Get key](https://cursor.com/dashboard?tab=integrations)
 - GEMINI_API_KEY — [Get key](https://aistudio.google.com/app/apikey)
 - GH_TOKEN — [Get key](https://github.com/settings/personal-access-tokens/new)
-- OPENAI_API_KEY — [Get key](https://platform.openai.com/api-keys)
 - QODO_API_KEY — https://app.qodo.ai/ — **⚠️ Warning:** Must install on a browser-enabled device and use `qodo login` to obtain a key. 
 
 ### Lucidchart
