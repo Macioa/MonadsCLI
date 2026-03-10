@@ -127,16 +127,25 @@ func ExecuteTree(root *types.ProcessedNode, opts run.RunOptions, workDir, logDir
 		if err != nil {
 			return res, err
 		}
-		if len(node.Children) > 0 {
-			d, parseErr := types.ParseDecisionResponse(res.RunResult.Stdout)
-			if parseErr != nil {
-				return res, parseErr
-			}
-			child := resolveChild(node.Children, d.Answer)
-			if child != nil {
+		if len(node.Children) == 0 {
+			return res, nil
+		}
+		if len(node.Children) == 1 {
+			// Single child: process node; recurse to the only next step (no choice).
+			for _, child := range node.Children {
 				_, err = runNode(child)
 				return res, err
 			}
+		}
+		// Multiple children: decision node; parse answer and recurse to chosen child.
+		d, parseErr := types.ParseDecisionResponse(res.RunResult.Stdout)
+		if parseErr != nil {
+			return res, parseErr
+		}
+		child := resolveChild(node.Children, d.Answer)
+		if child != nil {
+			_, err = runNode(child)
+			return res, err
 		}
 		return res, nil
 	}

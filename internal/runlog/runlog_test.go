@@ -13,29 +13,21 @@ import (
 )
 
 // TestExecuteTree_singleChildFollowedRegardlessOfAnswer verifies that when a node has
-// exactly one child, the runner follows it regardless of the parsed answer (e.g. Process
-// with unlabeled edge: agent returns "animal3.txt" but the only child is keyed "").
+// exactly one child, it is treated as a process node: the CLI receives the process
+// response instruction and returns ProcessResponse; the runner then recurses to the
+// single child without parsing a decision answer.
 func TestExecuteTree_singleChildFollowedRegardlessOfAnswer(t *testing.T) {
 	callCount := 0
 	run.SetShellRunner(func(spec runner.CommandSpec) (runner.Result, error) {
 		callCount++
-		var stdout string
-		switch callCount {
-		case 1:
-			// Root (Start): return answer that does NOT match the single child key ""
-			stdout = `{"choices":[""],"answer":"wrong_key","reasons":["Proceeding."]}`
-		case 2:
-			// Child (Next): leaf response so execution stops
-			stdout = `{"completed": true, "secs_taken": 0, "tokens_used": 0, "comments": []}`
-		default:
-			t.Fatalf("unexpected shell call #%d", callCount)
-		}
+		// Both root (single child) and child (leaf) use process response.
+		stdout := `{"completed": true, "secs_taken": 0, "tokens_used": 0, "comments": []}`
 		return runner.Result{Stdout: stdout, Success: true}, nil
 	})
 	defer run.SetShellRunner(nil)
 
-	// Root has one child keyed "" (unlabeled edge). Without single-child fallback,
-	// we would look up Children["wrong_key"] = nil and stop after the first node.
+	// Root has one child (unlabeled edge). Single-child nodes are process nodes:
+	// root runs with process instruction, then runner recurses to child without parsing answer.
 	child := &types.ProcessedNode{Name: "Next", Prompt: "Do next"}
 	root := &types.ProcessedNode{
 		Name:     "Start",

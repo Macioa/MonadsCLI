@@ -8,7 +8,7 @@ This document describes the technical pipeline for running a decision tree: impo
 
 ## Overview
 
-A decision tree is a rooted tree of nodes. Each node is run by invoking a configured CLI with a prompt; the CLI’s stdout is parsed as a structured response. Childless nodes use a process response type; nodes with children use a decision response type so the runner can select the next branch. Optionally, a node’s output is validated by a second CLI call; if validation fails, the node is retried with a combined prompt until validation passes or a retry limit is reached.
+A decision tree is a rooted tree of nodes. Each node is run by invoking a configured CLI with a prompt; the CLI’s stdout is parsed as a structured response. **Process nodes** (no children or exactly one child) use a process response type: the CLI performs the task and returns `ProcessResponse`; the runner then continues to the single child if present. **Decision nodes** (multiple children) use a decision response type so the runner can select the next branch from the CLI’s `answer`. Optionally, a process node’s output is validated by a second CLI call; if validation fails, the node is retried with a combined prompt until validation passes or a retry limit is reached.
 
 ---
 
@@ -52,8 +52,8 @@ Running a node executes the node’s CLI with a constructed prompt and (in the r
 
 - Base: the node’s `Prompt`.
 - The runner appends a response-type instruction so the CLI returns parseable JSON:
-  - **Childless node:** process response type (`completed`, `secs_taken`, `tokens_used`, `comments`). Instruction from `prompts.ProcessResponseInstruction()`.
-  - **Node with children:** decision response type (`choices`, `answer`, `reasons`). Instruction from `prompts.DecisionResponseInstruction()`.
+  - **Process node (0 or 1 child):** process response type (`completed`, `secs_taken`, `tokens_used`, `comments`). The CLI does the task; if the node has one child, the runner then continues to that child.
+  - **Decision node (2+ children):** decision response type (`choices`, `answer`, `reasons`). The runner selects the next branch from `answer`.
 - Implementation: `internal/run.BuildRunPrompt(node)` uses `ResponseKind(node)` to choose the instruction.
 
 **Execution**
@@ -74,9 +74,9 @@ After a successful run, the node may be validated. Validation is a second CLI ca
 **When validation runs**
 
 - Validation runs only if:
-  - The node has no children (decision nodes are not validated), and
+  - The node is a process node (0 or 1 child; decision nodes with multiple children are not validated), and
   - The node does not have the `NoValidation` tag (in that case `ValidatePrompt` is empty and validation is skipped).
-- Implementation: `internal/run.ShouldValidate(node)` is true when `node.ValidatePrompt` is non-empty and `node.Children` is empty.
+- Implementation: `internal/run.ShouldValidate(node)` is true when `node.ValidatePrompt` is non-empty and `len(node.Children) <= 1`.
 
 **Validation prompt**
 
@@ -144,8 +144,9 @@ Implementation: `internal/run.runRetryLoop` (called from `RunNodeThenValidate` w
      - Run node (RunNode).
      - If `ShouldValidate(node)`: run validation (RunValidation). If not valid, run retry loop until valid or limit.
   2. Log the node result (run output, validation if any, retry count).
-  3. If the node has children: parse run stdout as `DecisionResponse`, select child by `d.Answer`, recurse on that child. If parsing fails, the tree run returns the parse error.
-  4. If the node has no children: continue to the next sibling or end of tree.
+  3. If the node has one child: recurse on that child (process node; no choice to parse).
+  4. If the node has multiple children: parse run stdout as `DecisionResponse`, select child by `d.Answer`, recurse on that child. If parsing fails, the tree run returns the parse error.
+  5. If the node has no children: continue to the next sibling or end of tree.
 - When the tree walk completes, logs are written (short JSON and/or long log) to the configured log directory.
 
 ---
@@ -154,8 +155,8 @@ Implementation: `internal/run.runRetryLoop` (called from `RunNodeThenValidate` w
 
 | Kind        | Type                 | Use                    | Keys (JSON)                                                                 |
 |------------|----------------------|------------------------|-----------------------------------------------------------------------------|
-| Process    | `ProcessResponse`    | Childless node output  | `completed`, `secs_taken`, `tokens_used`, `comments`                        |
-| Decision   | `DecisionResponse`   | Node with children     | `choices`, `answer`, `reasons`                                             |
+| Process    | `ProcessResponse`    | Node with 0 or 1 child | `completed`, `secs_taken`, `tokens_used`, `comments`                        |
+| Decision   | `DecisionResponse`   | Node with 2+ children  | `choices`, `answer`, `reasons`                                             |
 | Validation | `ValidationResponse`| Validation step output | `fully_completed`, `partially_completed`, `should_retry`, `warnings`         |
 
 Defined in `types/responses.go`; parsed via `ParseProcessResponse`, `ParseDecisionResponse`, `ParseValidationResponse` (with handling for markdown fences and trailing non-JSON).

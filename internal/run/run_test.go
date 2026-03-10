@@ -20,10 +20,16 @@ func TestResponseKind(t *testing.T) {
 			t.Errorf("ResponseKind(childless) = %q, want process", got)
 		}
 	})
-	t.Run("has_children", func(t *testing.T) {
-		n := &types.ProcessedNode{Children: map[string]*types.ProcessedNode{"Yes": {}}}
+	t.Run("single_child_process", func(t *testing.T) {
+		n := &types.ProcessedNode{Prompt: "P", Children: map[string]*types.ProcessedNode{"Next": {}}}
+		if got := ResponseKind(n); got != ResponseKindProcess {
+			t.Errorf("ResponseKind(single child) = %q, want process", got)
+		}
+	})
+	t.Run("multiple_children_decision", func(t *testing.T) {
+		n := &types.ProcessedNode{Children: map[string]*types.ProcessedNode{"Yes": {}, "No": {}}}
 		if got := ResponseKind(n); got != ResponseKindDecision {
-			t.Errorf("ResponseKind(has children) = %q, want decision", got)
+			t.Errorf("ResponseKind(multiple children) = %q, want decision", got)
 		}
 	})
 }
@@ -86,7 +92,7 @@ func TestBuildRunPrompt(t *testing.T) {
 		}
 	})
 	t.Run("decision", func(t *testing.T) {
-		n := &types.ProcessedNode{Prompt: "Choose one", Children: map[string]*types.ProcessedNode{"A": {}}}
+		n := &types.ProcessedNode{Prompt: "Choose one", Children: map[string]*types.ProcessedNode{"A": {}, "B": {}}}
 		got := BuildRunPrompt(n)
 		if !strings.Contains(got, "Choose one") {
 			t.Errorf("BuildRunPrompt missing base prompt: %q", got)
@@ -177,15 +183,21 @@ func TestShouldValidate(t *testing.T) {
 		}
 	})
 	t.Run("has_children_skipped", func(t *testing.T) {
-		n := &types.ProcessedNode{Prompt: "P", ValidatePrompt: "Check it", Children: map[string]*types.ProcessedNode{"A": {}}}
+		n := &types.ProcessedNode{Prompt: "P", ValidatePrompt: "Check it", Children: map[string]*types.ProcessedNode{"A": {}, "B": {}}}
 		if ShouldValidate(n) {
-			t.Error("ShouldValidate(node with children) want false")
+			t.Error("ShouldValidate(decision node with multiple children) want false")
 		}
 	})
 	t.Run("childless_with_validate_prompt", func(t *testing.T) {
 		n := &types.ProcessedNode{Prompt: "P", ValidatePrompt: "Did it follow instructions?"}
 		if !ShouldValidate(n) {
 			t.Error("ShouldValidate(childless with ValidatePrompt) want true")
+		}
+	})
+	t.Run("single_child_with_validate_prompt", func(t *testing.T) {
+		n := &types.ProcessedNode{Prompt: "P", ValidatePrompt: "Check it", Children: map[string]*types.ProcessedNode{"Next": {}}}
+		if !ShouldValidate(n) {
+			t.Error("ShouldValidate(single child with ValidatePrompt) want true")
 		}
 	})
 }
@@ -338,7 +350,7 @@ func TestBuildRetryPrompt(t *testing.T) {
 		}
 	})
 	t.Run("decision_includes_decision_instruction", func(t *testing.T) {
-		n := &types.ProcessedNode{Prompt: "Choose", Children: map[string]*types.ProcessedNode{"A": {}}}
+		n := &types.ProcessedNode{Prompt: "Choose", Children: map[string]*types.ProcessedNode{"A": {}, "B": {}}}
 		got := BuildRetryPrompt(n, []string{"Fix it"})
 		if !strings.Contains(got, "choices") || !strings.Contains(got, "answer") {
 			t.Errorf("BuildRetryPrompt(decision) should include decision instruction: %q", got)
@@ -394,7 +406,7 @@ func TestVerifyRunOutput(t *testing.T) {
 		}
 	})
 	t.Run("decision_valid", func(t *testing.T) {
-		n := &types.ProcessedNode{Children: map[string]*types.ProcessedNode{"A": {}}}
+		n := &types.ProcessedNode{Children: map[string]*types.ProcessedNode{"A": {}, "B": {}}}
 		stdout := `{"choices": ["A","B"], "answer": "A", "reasons": []}`
 		if err := VerifyRunOutput(n, stdout); err != nil {
 			t.Errorf("VerifyRunOutput(decision) = %v", err)

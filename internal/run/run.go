@@ -16,18 +16,19 @@ var (
 )
 
 const (
-	// ResponseKindProcess is used for childless (leaf) nodes.
+	// ResponseKindProcess is used for leaf nodes and for nodes with exactly one child (linear step).
 	ResponseKindProcess = "process"
-	// ResponseKindDecision is used for nodes that have children.
+	// ResponseKindDecision is used for nodes with multiple children (branching choice).
 	ResponseKindDecision = "decision"
 )
 
-// ResponseKind returns "process" for childless nodes and "decision" for nodes with children.
+// ResponseKind returns "process" for childless nodes and for nodes with exactly one child;
+// returns "decision" only for nodes with multiple children.
 func ResponseKind(node *types.ProcessedNode) string {
 	if node == nil {
 		return ResponseKindProcess
 	}
-	if len(node.Children) > 0 {
+	if len(node.Children) > 1 {
 		return ResponseKindDecision
 	}
 	return ResponseKindProcess
@@ -153,12 +154,12 @@ func RunNode(node *types.ProcessedNode, opts RunOptions) (runner.Result, error) 
 }
 
 // ShouldValidate reports whether the node should be validated after it runs.
-// Validation is skipped when the node has the NoValidation tag (ValidatePrompt empty) or has children.
+// Validation is skipped when the node has the NoValidation tag (ValidatePrompt empty) or has multiple children (decision node).
 func ShouldValidate(node *types.ProcessedNode) bool {
 	if node == nil {
 		return false
 	}
-	if len(node.Children) > 0 {
+	if len(node.Children) > 1 {
 		return false
 	}
 	return strings.TrimSpace(node.ValidatePrompt) != ""

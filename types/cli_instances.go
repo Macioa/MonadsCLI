@@ -56,7 +56,7 @@ var QodoCLI = CLI{
 	KeyENV:   "QODO_API_KEY",
 	Codename: "QODO",
 	Command:  "qodo",
-	Prompt:   "qodo chat -y",
+	Prompt:   "qodo -y --ci \"<prompt>\"",
 	Install:  "npm install -g @qodo/gen",
 }
 
