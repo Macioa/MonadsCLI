@@ -18,19 +18,20 @@ func DefaultValidatePrompt() string {
 // with a JSON object matching ProcessResponse (completed, secs_taken, tokens_used, comments).
 // Used for childless (leaf) nodes.
 func ProcessResponseInstruction() string {
-	return "Respond with only a JSON object with keys: completed (boolean), secs_taken (number), tokens_used (number), comments (array of strings)."
+	return "Respond with only a JSON object with keys: completed (boolean), secs_taken (number), tokens_used (number), comments (array of strings). Do not include any explanation, markdown, or text before or after the JSON — output only the single JSON object."
 }
 
 // DecisionResponseInstruction returns prompt text that instructs the CLI to respond
 // with a JSON object matching DecisionResponse (choices, answer, reasons).
 // Used for nodes that have children (decision nodes).
 func DecisionResponseInstruction() string {
-	return "Respond with only a JSON object with keys: choices (array of strings), answer (string), reasons (array of strings)."
+	return "Respond with only a JSON object with keys: choices (array of strings), answer (string), reasons (array of strings). Do not include any explanation, markdown, or text before or after the JSON — output only the single JSON object."
 }
 
 // ValidationResponseInstruction returns prompt text that instructs the CLI to respond
 // with a JSON object matching ValidationResponse (fully_completed, partially_completed, should_retry, warnings).
 // Used when running the validation prompt after a node completes.
 func ValidationResponseInstruction() string {
-	return "Respond with only a JSON object with keys: fully_completed (boolean), partially_completed (boolean), should_retry (boolean), warnings (array of strings)."
+	return "Respond with only a JSON object with keys: fully_completed (boolean), partially_completed (boolean), should_retry (boolean), warnings (array of strings). Do not include any explanation, markdown, or text before or after the JSON — output only the single JSON object."
 }
+
