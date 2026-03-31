@@ -3,6 +3,13 @@
 # MonadsCLI
 ### (Pre-Alpha)
 
+<div align="center">
+  <img src="images/MonadsTitle.png" alt="MonadsCLI logo" width="280" height="131" />
+</div>
+<div align="center">
+  <img src="images/MonadsGraphic.png" alt="Monads graphic" width="160" />
+</div>
+
 <p align="center"><strong>Run <a href="https://www.lucidchart.com/pages/landing/flowchart-software">Lucidchart</a> decision trees with agentic CLI's.</strong></p>
 
 <p align="center"><img src="images/tree.png" alt="Decision tree" /></p>
