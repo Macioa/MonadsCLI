@@ -10,11 +10,17 @@ go install github.com/ryanmontgomery/MonadsCLI/cmd/monadscli@latest
 
 See [Install](install.md) for PATH and supported platforms.
 
-**2. Create a decision tree**
+**2. Install one or more agents and save your key** ([settings page](settings.md))
+
+```bash
+monadscli install cursor && monadscli settings set CURSOR_API_KEY=YOUR_KEY
+```
+
+**3. Create a decision tree**
 
 Design and export your tree in Lucidchart. See [Creating a Lucidchart decision tree](create-tree.md).
 
-**3. Run the tree**
+**4. Run the tree**
 
 **From CSV** (no API key):
 

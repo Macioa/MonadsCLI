@@ -21,7 +21,7 @@ func InstallCLIs(names []string) ([]runner.Result, error) {
 		result, runErr := runner.RunShellCommand(runner.CommandSpec{
 			Shell:     shell,
 			ShellArgs: shellArgs,
-			Command:   cli.Install,
+			Command:   cli.InstallCommand(),
 		})
 		results = append(results, result)
 
